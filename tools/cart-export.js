@@ -58,15 +58,35 @@ function main() {
         process.exit(1);
     }
 
+    const result = exportCart(cartPath, { outFile });
+    fs.writeFileSync(result.outFile, result.html);
+    console.log(`Exported: ${result.outFile}`);
+}
+
+/**
+ * Build an inlined HTML export for `cartPath`.
+ *
+ * Loads the cart JSON, inlines the JS code source and (optional) sprite sheet
+ * as base64, and assembles a self-contained HTML document with the merged
+ * cart object exposed as `window.DITHR_CART`.
+ *
+ * Returns `{ html, exportCart, outFile, jsSource, spriteDataUrl }`. The caller
+ * is responsible for writing `html` to disk; this lets tests round-trip the
+ * export without touching the filesystem.
+ *
+ * @param {string} cartPath  Absolute path to the source cart.json
+ * @param {{ outFile?: string }} [opts]
+ */
+function exportCart(cartPath, opts) {
+    const options = opts || {};
     const basePath = path.dirname(cartPath);
     const cart = readCartFile(cartPath);
     const title = cart.title || "dithr cart";
 
-    if (!outFile) {
-        outFile = path.join(basePath, `${title.replace(/[^a-zA-Z0-9_-]/g, "_")}.html`);
-    }
+    const outFile =
+        options.outFile ||
+        path.join(basePath, `${title.replace(/[^a-zA-Z0-9_-]/g, "_")}.html`);
 
-    // Read JS source
     let jsSource = "";
     if (cart.code) {
         const codePath = resolveAsset(basePath, cart.code);
@@ -75,7 +95,6 @@ function main() {
         }
     }
 
-    // Read sprite sheet as base64
     let spriteDataUrl = "";
     if (cart.sprites && cart.sprites.sheet) {
         const sheetPath = resolveAsset(basePath, cart.sprites.sheet);
@@ -86,14 +105,24 @@ function main() {
         }
     }
 
-    // Build embedded cart JSON (inline assets)
-    const exportCart = JSON.parse(JSON.stringify(cart));
-    exportCart._embedded = {
+    const exported = JSON.parse(JSON.stringify(cart));
+    exported._embedded = {
         code: jsSource,
         sprites: spriteDataUrl,
     };
 
-    const html = `<!DOCTYPE html>
+    const html = renderHtml(title, exported);
+    return {
+        html,
+        outFile,
+        exportCart: exported,
+        jsSource,
+        spriteDataUrl,
+    };
+}
+
+function renderHtml(title, exported) {
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -134,7 +163,7 @@ canvas { display: block; margin: auto; image-rendering: pixelated; }
 </script>
 <script>
 // dithr embedded cart — requires dithr WASM runtime
-window.DITHR_CART = ${JSON.stringify(exportCart)};
+window.DITHR_CART = ${JSON.stringify(exported)};
 </script>
 <script>
 // WIP: WASM runtime loading is not yet implemented.
@@ -146,9 +175,6 @@ console.log("Cart:", window.DITHR_CART.meta);
 </script>
 </body>
 </html>`;
-
-    fs.writeFileSync(outFile, html);
-    console.log(`Exported: ${outFile}`);
 }
 
 function escapeHtml(str) {
@@ -159,4 +185,8 @@ function escapeHtml(str) {
         .replace(/"/g, "&quot;");
 }
 
-main();
+if (require.main === module) {
+    main();
+}
+
+module.exports = { exportCart, renderHtml };

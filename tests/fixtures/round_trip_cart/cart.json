@@ -1,0 +1,25 @@
+{
+  "title": "Round Trip Test",
+  "author": "dithr-tests",
+  "version": "1.0.0",
+  "description": "Fixture cart for tools/cart-export.js round-trip test",
+  "display": {
+    "width": 320,
+    "height": 180,
+    "scale": 2
+  },
+  "timing": {
+    "fps": 60,
+    "ups": 60
+  },
+  "audio": {
+    "channels": 4
+  },
+  "input": {
+    "default_mappings": {}
+  },
+  "code": "dist/main.js",
+  "sprites": {
+    "sheet": "assets/sheet.png"
+  }
+}

@@ -55,6 +55,9 @@ jobs:
                   done
                   exit $failed
 
+            - name: Run Node tooling tests
+              run: node --test tests/tools/cart-export.test.mjs
+
     # ---------------------------------------------------------------------------
     #  Static analysis — clang-tidy
     # ---------------------------------------------------------------------------
