@@ -230,6 +230,14 @@ static JSValue js_map_draw(JSContext *ctx, JSValueConst this_val, int argc, JSVa
             return JS_UNDEFINED;
         }
 
+        if (con->graphics->sheet.pixels == NULL || con->graphics->sheet.tile_w <= 0 ||
+            con->graphics->sheet.tile_h <= 0) {
+            return JS_ThrowReferenceError(
+                ctx,
+                "map.draw: no active sprite sheet "
+                "(call res.setActiveSheet({tileW, tileH}) after res.loadSprite)");
+        }
+
         dtr_gfx_map_draw(con->graphics,
                          layer->tiles,
                          layer->width,
@@ -240,8 +248,8 @@ static JSValue js_map_draw(JSContext *ctx, JSValueConst this_val, int argc, JSVa
                          th,
                          dx,
                          dy,
-                         con->cart->sprites.tile_w,
-                         con->cart->sprites.tile_h);
+                         con->graphics->sheet.tile_w,
+                         con->graphics->sheet.tile_h);
     }
 
     return JS_UNDEFINED;
@@ -678,10 +686,13 @@ static JSValue js_map_create(JSContext *ctx, JSValueConst this_val, int argc, JS
         return JS_FALSE;
     }
 
-    level->width       = wid;
-    level->height      = hgt;
-    level->tile_w      = con->cart->sprites.tile_w;
-    level->tile_h      = con->cart->sprites.tile_h;
+    level->width  = wid;
+    level->height = hgt;
+    /* Tile size is intentionally zero here; map.draw will read the active
+     * sheet's tile size at draw time.  Importers (TMJ/LDtk) populate this
+     * from the source file when available. */
+    level->tile_w      = 0;
+    level->tile_h      = 0;
     level->layer_count = 1;
     level->layers      = DTR_CALLOC(1, sizeof(dtr_map_layer_t));
     if (level->layers == NULL) {

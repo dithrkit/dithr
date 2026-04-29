@@ -71,7 +71,6 @@ const cart = {
     description: "",
     display: { width: 320, height: 180, scale: 3 },
     timing: { fps: 60 },
-    sprites: { tileW: 8, tileH: 8 },
     audio: { channels: 8 },
     input: {
         default_mappings: {

@@ -99,8 +99,6 @@ typedef struct dtr_cart_timing {
 /* ------------------------------------------------------------------------ */
 
 typedef struct dtr_cart_sprites {
-    int32_t tile_w;
-    int32_t tile_h;
     int32_t max_sprites;
 } dtr_cart_sprites_t;
 

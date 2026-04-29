@@ -342,8 +342,9 @@ js_res_setActiveSheet(JSContext *ctx, JSValueConst this_val, int argc, JSValueCo
     }
     JS_FreeCString(ctx, name);
 
-    tile_w = 8;
-    tile_h = 8;
+    /* tileW / tileH are required: the cart no longer carries a default. */
+    tile_w = 0;
+    tile_h = 0;
     if (argc >= 2 && JS_IsObject(argv[1])) {
         JSValue v;
 
@@ -357,6 +358,10 @@ js_res_setActiveSheet(JSContext *ctx, JSValueConst this_val, int argc, JSValueCo
             JS_ToInt32(ctx, &tile_h, v);
         }
         JS_FreeValue(ctx, v);
+    }
+    if (tile_w <= 0 || tile_h <= 0) {
+        return JS_ThrowTypeError(
+            ctx, "res.setActiveSheet: opts.tileW and opts.tileH are required and must be > 0");
     }
 
     e = &con->res->entries[slot];

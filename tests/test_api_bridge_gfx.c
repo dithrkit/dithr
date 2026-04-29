@@ -464,6 +464,39 @@ static void test_ui_vsplit(void)
 }
 
 /* ================================================================== */
+/*  gfx.spr / sspr / sprRot / sprAffine / sprBatch                      */
+/*  No active sprite sheet → ReferenceError                             */
+/* ================================================================== */
+
+static void prv_assert_throws_ref(test_ctx_t *tc, const char *code)
+{
+    JSValue val;
+    JSValue exc;
+
+    val = JS_Eval(tc->rt->ctx, code, strlen(code), "<test>", JS_EVAL_TYPE_GLOBAL);
+    DTR_ASSERT(JS_IsException(val));
+    JS_FreeValue(tc->rt->ctx, val);
+    exc = JS_GetException(tc->rt->ctx);
+    JS_FreeValue(tc->rt->ctx, exc);
+}
+
+static void test_gfx_spr_throws_without_sheet(void)
+{
+    test_ctx_t *tc = prv_setup();
+
+    prv_register(tc, dtr_gfx_api_register);
+
+    prv_assert_throws_ref(tc, "gfx.spr(0, 0, 0)");
+    prv_assert_throws_ref(tc, "gfx.sspr(0, 0, 8, 8, 0, 0)");
+    prv_assert_throws_ref(tc, "gfx.sprRot(0, 0, 0, 0)");
+    prv_assert_throws_ref(tc, "gfx.sprAffine(0, 0, 0, 1, 0, 0, 1)");
+    prv_assert_throws_ref(tc, "gfx.sprBatch([{n:0, x:0, y:0}])");
+
+    prv_teardown(tc);
+    DTR_PASS();
+}
+
+/* ================================================================== */
 /*  Runner                                                             */
 /* ================================================================== */
 
@@ -502,6 +535,9 @@ int main(void)
     DTR_RUN_TEST(test_ui_inset);
     DTR_RUN_TEST(test_ui_hsplit);
     DTR_RUN_TEST(test_ui_vsplit);
+
+    /* spr* throws when no active sheet — 1 test */
+    DTR_RUN_TEST(test_gfx_spr_throws_without_sheet);
 
     DTR_TEST_END();
 }

@@ -85,10 +85,6 @@ function main() {
         timing: {
             fps: 60,
         },
-        sprites: {
-            tileW: 8,
-            tileH: 8,
-        },
         audio: {
             channels: 8,
         },

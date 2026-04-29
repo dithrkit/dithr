@@ -559,6 +559,58 @@ static void test_load_sprite_decodes_png(void)
     fprintf(stderr, "  PASS load_sprite_decodes_png\n");
 }
 
+static void test_set_active_sheet_requires_tile_dims(void)
+{
+    test_ctx_t *tc;
+    JSValue     v;
+
+    fprintf(stderr, "  set_active_sheet_requires_tile_dims\n");
+    tc = prv_setup();
+
+    /* No opts → throw */
+    v = JS_Eval(tc->rt->ctx,
+                "res.setActiveSheet('px')",
+                strlen("res.setActiveSheet('px')"),
+                "<test>",
+                JS_EVAL_TYPE_GLOBAL);
+    DTR_ASSERT(JS_IsException(v));
+    JS_FreeValue(tc->rt->ctx, v);
+    JS_FreeValue(tc->rt->ctx, JS_GetException(tc->rt->ctx));
+
+    /* Empty opts → throw */
+    v = JS_Eval(tc->rt->ctx,
+                "res.setActiveSheet('px', {})",
+                strlen("res.setActiveSheet('px', {})"),
+                "<test>",
+                JS_EVAL_TYPE_GLOBAL);
+    DTR_ASSERT(JS_IsException(v));
+    JS_FreeValue(tc->rt->ctx, v);
+    JS_FreeValue(tc->rt->ctx, JS_GetException(tc->rt->ctx));
+
+    /* tileW only → throw */
+    v = JS_Eval(tc->rt->ctx,
+                "res.setActiveSheet('px', { tileW: 8 })",
+                strlen("res.setActiveSheet('px', { tileW: 8 })"),
+                "<test>",
+                JS_EVAL_TYPE_GLOBAL);
+    DTR_ASSERT(JS_IsException(v));
+    JS_FreeValue(tc->rt->ctx, v);
+    JS_FreeValue(tc->rt->ctx, JS_GetException(tc->rt->ctx));
+
+    /* Zero/negative dims → throw */
+    v = JS_Eval(tc->rt->ctx,
+                "res.setActiveSheet('px', { tileW: 0, tileH: 8 })",
+                strlen("res.setActiveSheet('px', { tileW: 0, tileH: 8 })"),
+                "<test>",
+                JS_EVAL_TYPE_GLOBAL);
+    DTR_ASSERT(JS_IsException(v));
+    JS_FreeValue(tc->rt->ctx, v);
+    JS_FreeValue(tc->rt->ctx, JS_GetException(tc->rt->ctx));
+
+    prv_teardown(tc);
+    fprintf(stderr, "  PASS set_active_sheet_requires_tile_dims\n");
+}
+
 int main(void)
 {
     fprintf(stderr, "test_api_res:\n");
@@ -579,6 +631,7 @@ int main(void)
     test_init_sync_does_not_pend();
     test_init_slow_warning_fires_once();
     test_load_sprite_decodes_png();
+    test_set_active_sheet_requires_tile_dims();
     fprintf(stderr, "ALL PASS\n");
     return 0;
 }

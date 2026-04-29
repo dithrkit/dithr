@@ -48,10 +48,6 @@ void dtr_cart_defaults(dtr_cart_t *cart)
     cart->timing.ups    = CONSOLE_FPS;
     cart->timing.frozen = false;
 
-    /* Sprite defaults */
-    cart->sprites.tile_w = CONSOLE_TILE_W;
-    cart->sprites.tile_h = CONSOLE_TILE_H;
-
     /* Runtime defaults */
     cart->runtime.mem_limit   = CONSOLE_JS_MEM_MB * 1024 * 1024;
     cart->runtime.stack_limit = CONSOLE_JS_STACK_KB * 1024;
@@ -202,11 +198,10 @@ bool dtr_cart_parse(dtr_cart_t *cart, JSContext *ctx, const char *json, size_t l
     /* --- sprites --- */
     sub = JS_GetPropertyStr(ctx, root, "sprites");
     if (JS_IsObject(sub)) {
-        cart->sprites.tile_w = prv_json_int(ctx, sub, "tileW", CONSOLE_TILE_W);
-        cart->sprites.tile_h = prv_json_int(ctx, sub, "tileH", CONSOLE_TILE_H);
-
-        /* Phase 3: sprites.sheet is gone — load via res.loadSprite() instead.
-         * sprites.flags is still honored for now (it's small and palette-side). */
+        /* Sprite sheets are loaded at runtime via res.loadSprite() and bound
+         * via res.setActiveSheet({tileW, tileH}); the cart no longer carries
+         * default tile dimensions.  sprites.flags is still honored (it's
+         * small and palette-side). */
         {
             JSValue flags_val;
 
@@ -458,16 +453,6 @@ bool dtr_cart_validate(dtr_cart_t *cart)
     if (cart->runtime.stack_limit > (uint32_t)CONSOLE_JS_STACK_KB * 1024u) {
         cart->runtime.stack_limit = (uint32_t)CONSOLE_JS_STACK_KB * 1024u;
         valid                     = false;
-    }
-
-    /* Tile dimensions must be in range 4-64 */
-    if (cart->sprites.tile_w < 4 || cart->sprites.tile_w > 64) {
-        cart->sprites.tile_w = CONSOLE_TILE_W;
-        valid                = false;
-    }
-    if (cart->sprites.tile_h < 4 || cart->sprites.tile_h > 64) {
-        cart->sprites.tile_h = CONSOLE_TILE_H;
-        valid                = false;
     }
 
     return valid;

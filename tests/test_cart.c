@@ -49,7 +49,6 @@ static void test_cart_defaults(void)
     assert(cart->timing.fps == CONSOLE_FPS);
     assert(cart->audio.channels == CONSOLE_AUDIO_CHANNELS);
     assert(cart->audio.frequency == CONSOLE_AUDIO_FREQ);
-    assert(cart->sprites.tile_w == CONSOLE_TILE_W);
     assert(strcmp(cart->meta.title, "Untitled") == 0);
     dtr_cart_destroy(cart);
     printf("  PASS test_cart_defaults\n");
@@ -235,24 +234,6 @@ static void test_cart_validate_clamp_fps(void)
     assert(cart->timing.fps == 15);
     dtr_cart_destroy(cart);
     printf("  PASS test_cart_validate_clamp_fps\n");
-}
-
-/* ------------------------------------------------------------------ */
-/*  Validate — tile dimensions clamped                                 */
-/* ------------------------------------------------------------------ */
-
-static void test_cart_validate_clamp_tile(void)
-{
-    dtr_cart_t *cart;
-
-    cart                 = dtr_cart_create();
-    cart->sprites.tile_w = 2;
-    cart->sprites.tile_h = 128;
-    dtr_cart_validate(cart);
-    assert(cart->sprites.tile_w == CONSOLE_TILE_W);
-    assert(cart->sprites.tile_h == CONSOLE_TILE_H);
-    dtr_cart_destroy(cart);
-    printf("  PASS test_cart_validate_clamp_tile\n");
 }
 
 /* ------------------------------------------------------------------ */
@@ -736,10 +717,14 @@ static void test_cart_parse_sprites(void)
 {
     dtr_cart_t *cart;
     bool        ok;
+    /* Unknown sprites.* fields (tileW/tileH are no longer used) must parse
+     * without error so older carts keep loading; the values are simply
+     * ignored.  flags is the only remaining honored field. */
     const char *json = "{"
                        "  \"sprites\": {"
                        "    \"tileW\": 16,"
-                       "    \"tileH\": 16"
+                       "    \"tileH\": 16,"
+                       "    \"flags\": \"\""
                        "  }"
                        "}";
 
@@ -747,8 +732,6 @@ static void test_cart_parse_sprites(void)
     prv_setup();
     ok = dtr_cart_parse(cart, s_ctx, json, strlen(json));
     DTR_ASSERT(ok);
-    DTR_ASSERT_EQ_INT(cart->sprites.tile_w, 16);
-    DTR_ASSERT_EQ_INT(cart->sprites.tile_h, 16);
     prv_teardown();
     dtr_cart_destroy(cart);
     DTR_PASS();
@@ -1066,7 +1049,6 @@ int main(int argc, char *argv[])
     DTR_RUN_TEST(test_cart_validate_defaults);
     DTR_RUN_TEST(test_cart_validate_clamp_width);
     DTR_RUN_TEST(test_cart_validate_clamp_fps);
-    DTR_RUN_TEST(test_cart_validate_clamp_tile);
     DTR_RUN_TEST(test_cart_dset_dget);
     DTR_RUN_TEST(test_cart_dset_dget_out_of_range);
     DTR_RUN_TEST(test_cart_kv_save_load);

@@ -416,9 +416,30 @@ js_gfx_text_height(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst
 
 /* ---- Sprites ---------------------------------------------------------- */
 
+/* Throw if no sprite sheet is currently active.  All gfx.spr / sspr /
+ * sprRot / sprAffine / sprBatch calls require an active sheet — bound
+ * either via res.setActiveSheet({tileW, tileH}) after res.loadSprite,
+ * or via gfx.sheetCreate() for procedurally-built sheets. */
+static int prv_require_sheet(JSContext *ctx)
+{
+    dtr_graphics_t *gfx = GFX(ctx);
+    if (gfx->sheet.pixels == NULL || gfx->sheet.width <= 0 || gfx->sheet.height <= 0 ||
+        gfx->sheet.tile_w <= 0 || gfx->sheet.tile_h <= 0) {
+        JS_ThrowReferenceError(ctx,
+                               "gfx.spr*: no active sprite sheet "
+                               "(call res.setActiveSheet({tileW, tileH}) after res.loadSprite, "
+                               "or use gfx.sheetCreate)");
+        return -1;
+    }
+    return 0;
+}
+
 static JSValue js_gfx_spr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
     (void)this_val;
+    if (prv_require_sheet(ctx) != 0) {
+        return JS_EXCEPTION;
+    }
     dtr_gfx_spr(GFX(ctx),
                 dtr_api_opt_int(ctx, argc, argv, 0, 0),
                 dtr_api_opt_int(ctx, argc, argv, 1, 0),
@@ -450,6 +471,9 @@ static JSValue js_gfx_spr_batch(JSContext *ctx, JSValueConst this_val, int argc,
     if (argc < 1) {
         return JS_UNDEFINED;
     }
+    if (prv_require_sheet(ctx) != 0) {
+        return JS_EXCEPTION;
+    }
 
     ab = JS_GetTypedArrayBuffer(ctx, argv[0], &byte_off, &byte_len, &elem_size);
     if (JS_IsException(ab)) {
@@ -479,6 +503,9 @@ static JSValue js_gfx_spr_batch(JSContext *ctx, JSValueConst this_val, int argc,
 static JSValue js_gfx_sspr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
     (void)this_val;
+    if (prv_require_sheet(ctx) != 0) {
+        return JS_EXCEPTION;
+    }
     dtr_gfx_sspr(GFX(ctx),
                  dtr_api_opt_int(ctx, argc, argv, 0, 0),
                  dtr_api_opt_int(ctx, argc, argv, 1, 0),
@@ -494,6 +521,9 @@ static JSValue js_gfx_sspr(JSContext *ctx, JSValueConst this_val, int argc, JSVa
 static JSValue js_gfx_spr_rot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
     (void)this_val;
+    if (prv_require_sheet(ctx) != 0) {
+        return JS_EXCEPTION;
+    }
     dtr_gfx_spr_rot(GFX(ctx),
                     dtr_api_opt_int(ctx, argc, argv, 0, 0),
                     dtr_api_opt_int(ctx, argc, argv, 1, 0),
@@ -508,6 +538,9 @@ static JSValue
 js_gfx_spr_affine(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
     (void)this_val;
+    if (prv_require_sheet(ctx) != 0) {
+        return JS_EXCEPTION;
+    }
     dtr_gfx_spr_affine(GFX(ctx),
                        dtr_api_opt_int(ctx, argc, argv, 0, 0),
                        dtr_api_opt_int(ctx, argc, argv, 1, 0),

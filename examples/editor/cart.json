@@ -13,16 +13,12 @@
     "timing": {
         "fps": 60
     },
-    "sprites": {
-        "tileW": 8,
-        "tileH": 8
-    },
-    "audio": {
+        "audio": {
         "channels": 4
     },
-    "input": {
+  "input": {
         "default_mappings": {}
     },
-    "code": "dist/main.js",
-    "buildCommand": "npx esbuild src/main.ts --bundle --format=esm --target=es2020 --outfile=dist/main.js"
+  "code": "dist/main.js",
+  "buildCommand": "npx esbuild src/main.ts --bundle --format=esm --target=es2020 --outfile=dist/main.js"
 }

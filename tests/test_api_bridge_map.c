@@ -706,9 +706,35 @@ static void test_map_flag(void)
 static void test_map_draw_no_crash(void)
 {
     test_ctx_t *tc;
+    JSValue     val;
 
     tc = prv_setup_with_map();
     prv_register(tc, dtr_map_api_register);
+
+    /* Without an active sprite sheet map.draw must throw a ReferenceError. */
+    val = JS_Eval(tc->rt->ctx,
+                  "map.draw(0, 0, 0, 0, 4, 4)",
+                  strlen("map.draw(0, 0, 0, 0, 4, 4)"),
+                  "<test>",
+                  JS_EVAL_TYPE_GLOBAL);
+    DTR_ASSERT(JS_IsException(val));
+    JS_FreeValue(tc->rt->ctx, val);
+    {
+        JSValue exc = JS_GetException(tc->rt->ctx);
+        JS_FreeValue(tc->rt->ctx, exc);
+    }
+
+    /* Bind an active sheet directly on the graphics context so map.draw can
+     * proceed without a real PNG. */
+    {
+        dtr_graphics_t *gfx = tc->con.graphics;
+        static uint8_t  px[TW * TH];
+        gfx->sheet.pixels = px;
+        gfx->sheet.width  = TW;
+        gfx->sheet.height = TH;
+        gfx->sheet.tile_w = 8;
+        gfx->sheet.tile_h = 8;
+    }
 
     /* Just verify it doesn't crash with valid and edge-case args */
     prv_eval_void(tc, "map.draw(0, 0, 0, 0, 4, 4)");
@@ -716,6 +742,10 @@ static void test_map_draw_no_crash(void)
 
     /* Invalid layer */
     prv_eval_void(tc, "map.draw(0, 0, 0, 0, 4, 4, 99)");
+
+    /* Detach borrowed sheet pointer before teardown so dtr_gfx_destroy
+     * does not try to free our stack buffer. */
+    tc->con.graphics->sheet.pixels = NULL;
 
     prv_teardown(tc);
     DTR_PASS();

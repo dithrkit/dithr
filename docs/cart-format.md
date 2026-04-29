@@ -45,14 +45,6 @@ my-game/
         "ups": 60, // fixed updates per second (default 60)
     },
 
-    // --- Sprites ---
-    // Default tile size for spr*/map* when no setActiveSheet({tileW,tileH}) is set.
-    // Sheets themselves are loaded at runtime via res.loadSprite(name, path).
-    "sprites": {
-        "tileW": 8, // tile width in pixels  (default 8)
-        "tileH": 8, // tile height in pixels (default 8)
-    },
-
     // --- Audio ---
     "audio": {
         "channels": 8, // mixer channel count (default 8, max 16)
@@ -152,8 +144,6 @@ requires Chrome 117+, Firefox 130+, Safari 17.6+ (mid-2024); use
 | `timing.fps`             | int    | 60          | Target frames per second                                 |
 | `timing.ups`             | int    | 60          | Fixed updates per second (`_fixedUpdate` tick rate)      |
 | `sprites.sheet`          | string | —           | Path to sprite sheet PNG (relative to cart.json)         |
-| `sprites.tileW`          | int    | 8           | Sprite tile width                                        |
-| `sprites.tileH`          | int    | 8           | Sprite tile height                                       |
 | `audio.channels`         | int    | 8           | Mixer channels (max 16)                                  |
 | `input.default_mappings` | object | `{}`        | Action name → array of binding strings                   |
 | `code`                   | string | —           | Path to the main JS file (relative to cart.json)         |

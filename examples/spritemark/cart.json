@@ -12,10 +12,6 @@
     "fps": 60,
     "ups": 60
   },
-  "sprites": {
-    "tileW": 16,
-    "tileH": 16
-  },
   "audio": {
     "channels": 8
   },

@@ -11,14 +11,10 @@
     "timing": {
         "fps": 60
     },
-    "sprites": {
-        "tileW": 8,
-        "tileH": 8
-    },
-    "audio": {
+        "audio": {
         "channels": 8
     },
-    "input": {
+  "input": {
         "default_mappings": {
             "left": ["KEY_LEFT", "KEY_A", "PAD_LEFT"],
             "right": ["KEY_RIGHT", "KEY_D", "PAD_RIGHT"],
@@ -28,6 +24,6 @@
             "action": ["KEY_X", "PAD_B"]
         }
     },
-    "code": "dist/main.js",
-    "buildCommand": "npx esbuild src/main.ts --bundle --format=esm --target=es2020 --outfile=dist/main.js"
+  "code": "dist/main.js",
+  "buildCommand": "npx esbuild src/main.ts --bundle --format=esm --target=es2020 --outfile=dist/main.js"
 }

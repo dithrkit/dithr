@@ -332,10 +332,6 @@ static JSValue js_sys_config(JSContext *ctx, JSValueConst this_val, int argc, JS
                 result = JS_NewInt32(ctx, con->cart->display.scale);
             } else if (SDL_strcmp(path, "timing.fps") == 0) {
                 result = JS_NewInt32(ctx, con->cart->timing.fps);
-            } else if (SDL_strcmp(path, "sprites.tile_w") == 0) {
-                result = JS_NewInt32(ctx, con->cart->sprites.tile_w);
-            } else if (SDL_strcmp(path, "sprites.tile_h") == 0) {
-                result = JS_NewInt32(ctx, con->cart->sprites.tile_h);
             } else if (SDL_strcmp(path, "audio.channels") == 0) {
                 result = JS_NewInt32(ctx, con->cart->audio.channels);
             } else if (SDL_strcmp(path, "audio.frequency") == 0) {
@@ -366,8 +362,8 @@ static JSValue js_sys_config(JSContext *ctx, JSValueConst this_val, int argc, JS
         JS_SetPropertyStr(ctx, obj, "timing", tim);
 
         spr = JS_NewObject(ctx);
-        JS_SetPropertyStr(ctx, spr, "tile_w", JS_NewInt32(ctx, con->cart->sprites.tile_w));
-        JS_SetPropertyStr(ctx, spr, "tile_h", JS_NewInt32(ctx, con->cart->sprites.tile_h));
+        JS_SetPropertyStr(
+            ctx, spr, "max_sprites", JS_NewInt32(ctx, (int32_t)con->cart->sprites.max_sprites));
         JS_SetPropertyStr(ctx, obj, "sprites", spr);
 
         aud = JS_NewObject(ctx);
