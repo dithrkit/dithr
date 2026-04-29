@@ -379,7 +379,7 @@ jobs:
             - name: Configure
               run: >
                   cmake --preset wasm
-                  -DDTR_WASM_CART_DIR=${{ github.workspace }}/examples/hello_world
+                  -DDTR_WASM_CART_DIR=${{ github.workspace }}/examples/spritemark
                   -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
             - name: Build

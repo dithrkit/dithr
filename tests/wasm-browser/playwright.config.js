@@ -3,7 +3,7 @@ const { defineConfig } = require("@playwright/test");
 
 module.exports = defineConfig({
     testDir: ".",
-    testMatch: "wasm-smoke.spec.js",
+    testMatch: ["wasm-smoke.spec.js", "res-loadsprite.spec.js"],
     timeout: 60000,
     retries: 1,
     use: {
