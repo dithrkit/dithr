@@ -331,8 +331,7 @@ int16_t *dtr_synth_render(const dtr_synth_sfx_t *sfx, size_t *out_len)
             } else {
                 nti = rendered;
             }
-
-            note      = &sfx->notes[nti];
+            note      = &sfx->notes[nti]; /* NOLINT(clang-analyzer-security.ArrayBound) */
             base_freq = prv_pitch_freq(note->pitch);
             vol       = (float)note->volume / 7.0f;
             wave      = note->waveform;

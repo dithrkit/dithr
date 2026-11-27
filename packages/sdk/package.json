@@ -25,9 +25,13 @@
   "bin": {
     "dithrkit": "bin/dithrkit.js"
   },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
   "exports": {
     "./configs/tsconfig.base.json": "./configs/tsconfig.base.json",
     "./configs/eslint": "./configs/eslint.config.js",
+    "./lib/commands/create.js": "./lib/commands/create.js",
     "./types/*": "./types/*"
   },
   "files": [
@@ -38,7 +42,7 @@
     "configs/"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=22.14.0"
   },
   "dependencies": {
     "esbuild": "^0.24.0"

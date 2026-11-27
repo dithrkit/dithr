@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 
 project(dithr
-    VERSION 0.1.0
+    VERSION 0.2.0
     DESCRIPTION "Fantasy console engine for building retro games"
     LANGUAGES C
 )
@@ -130,10 +130,31 @@ set(DTR_AUDIO_BUFFER      2048  CACHE STRING "Audio buffer size")
 set(DTR_TARGET_FPS        60    CACHE STRING "Target framerate")
 set(DTR_JS_HEAP_MB        64    CACHE STRING "JS heap size in MB")
 set(DTR_JS_STACK_KB       512   CACHE STRING "JS stack size in KB")
-set(DTR_VERSION_STR       "0.1.0" CACHE STRING "Engine version string")
+set(DTR_VERSION_STR       "0.2.0" CACHE STRING "Engine version string")
 
 # --- Dependencies ---
 include(FetchContent)
+
+function(dtr_mark_system_headers target)
+    if (NOT TARGET ${target})
+        return()
+    endif()
+
+    get_target_property(_aliased_target ${target} ALIASED_TARGET)
+    if (_aliased_target)
+        set(_system_target ${_aliased_target})
+    else()
+        set(_system_target ${target})
+    endif()
+
+    get_target_property(_include_dirs ${_system_target} INTERFACE_INCLUDE_DIRECTORIES)
+    if (_include_dirs)
+        set_property(
+            TARGET ${_system_target}
+            APPEND PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${_include_dirs}
+        )
+    endif()
+endfunction()
 
 # SDL3
 set(SDL_HAPTIC  OFF)
@@ -145,10 +166,12 @@ set(SDL_LOCALE  ON)
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG release-3.4.4
+    GIT_TAG release-3.4.20
     GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(SDL3)
+dtr_mark_system_headers(SDL3::Headers)
+dtr_mark_system_headers(SDL3::SDL3)
 
 # SDL3_mixer
 set(SDLMIXER_FLAC    OFF)
@@ -161,11 +184,12 @@ set(MPG123_NO_ASM  ON CACHE BOOL "Disable mpg123 asm to suppress yasm warning")
 FetchContent_Declare(
     SDL3_mixer
     GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-    GIT_TAG release-3.2.0
+    GIT_TAG release-3.2.4
     GIT_SHALLOW TRUE
     EXCLUDE_FROM_ALL YES
 )
 FetchContent_MakeAvailable(SDL3_mixer)
+dtr_mark_system_headers(SDL3_mixer::SDL3_mixer)
 
 # SDL3_image
 set(SDLIMAGE_AVIF OFF)
@@ -189,16 +213,17 @@ set(SDLIMAGE_XV   OFF)
 set(SDLIMAGE_VENDORED OFF)
 FetchContent_Declare(
     SDL3_image
-    URL https://github.com/libsdl-org/SDL_image/releases/download/release-3.4.2/SDL3_image-3.4.2.tar.gz
+    URL https://github.com/libsdl-org/SDL_image/releases/download/release-3.4.8/SDL3_image-3.4.8.tar.gz
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(SDL3_image)
+dtr_mark_system_headers(SDL3_image::SDL3_image)
 
 # QuickJS-NG (download source only, we build it ourselves)
 FetchContent_Declare(
     quickjs
     GIT_REPOSITORY https://github.com/quickjs-ng/quickjs.git
-    GIT_TAG v0.14.0
+    GIT_TAG v0.18.0
     GIT_SHALLOW TRUE
 )
 FetchContent_GetProperties(quickjs)
@@ -214,7 +239,7 @@ add_library(quickjs STATIC
     ${quickjs_SOURCE_DIR}/libregexp.c
     ${quickjs_SOURCE_DIR}/dtoa.c
 )
-target_include_directories(quickjs PUBLIC ${quickjs_SOURCE_DIR})
+target_include_directories(quickjs SYSTEM PUBLIC ${quickjs_SOURCE_DIR})
 target_compile_definitions(quickjs PRIVATE
     QUICKJS_NG_BUILD
     _GNU_SOURCE

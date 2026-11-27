@@ -3,6 +3,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
+const EXCLUDED_DIRECTORIES = new Set([".git", "build", "node_modules"]);
+
 /**
  * Pack a directory tree into the Emscripten preload data format.
  *
@@ -36,6 +38,10 @@ function packDirectory(dir, mount) {
 
             if (entry.isSymbolicLink()) {
                 // Skip symlinks to prevent including files outside the cart
+                continue;
+            }
+
+            if (entry.isDirectory() && EXCLUDED_DIRECTORIES.has(entry.name)) {
                 continue;
             }
 
@@ -80,7 +86,10 @@ function generatePackageLoader(dataFilename, files) {
     for (const f of files) {
         const parts = f.filename.split("/");
         for (let i = 1; i < parts.length; i++) {
-            dirs.add(parts.slice(0, i).join("/"));
+            const dir = parts.slice(0, i).join("/");
+            if (dir) {
+                dirs.add(dir);
+            }
         }
     }
 
@@ -114,14 +123,14 @@ function generatePackageLoader(dataFilename, files) {
         "    // Create directories",
         ...dirList.map(
             (d) =>
-                `    Module['FS_createPath']('${path.dirname("/" + d).replace(/\\/g, "/")}', '${path.basename(d)}', true, true);`,
+                `    Module.FS.createPath('${path.posix.dirname(d)}', '${path.posix.basename(d)}', true, true);`,
         ),
         "",
         "    // Create files",
         "    PACKAGE_INFO.files.forEach(function(fileInfo) {",
         "      var data = byteArray.subarray(fileInfo.start, fileInfo.end);",
         "      var dir = fileInfo.filename.substring(0, fileInfo.filename.lastIndexOf('/'));",
-        "      Module['FS_createDataFile'](dir, fileInfo.filename.split('/').pop(), data, true, true, true);",
+        "      Module.FS.createDataFile(dir, fileInfo.filename.split('/').pop(), data, true, true, true);",
         "    });",
         "  }",
         "",

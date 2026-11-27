@@ -41,7 +41,7 @@ jobs:
 
             - uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: 26
 
             - name: Lint examples
               run: |
@@ -426,7 +426,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: 26
 
             - name: Install Playwright
               working-directory: tests/wasm-browser
@@ -448,15 +448,18 @@ jobs:
 
             - uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: 26
 
             - name: Install package dependencies
               run: npm install --ignore-scripts --omit=optional --prefix packages/sdk
 
+            - name: Test SDK package
+              run: npm test --prefix packages/sdk
+
             - name: Pack all packages
               run: |
                   mkdir -p build/npm-tarballs
-                  for pkg in sdk create wasm win32-x64 linux-x64 darwin-arm64; do
+                  for pkg in sdk create wasm win32-x64 linux-x64 linux-arm64 darwin-arm64; do
                     npm pack "./packages/$pkg" --pack-destination build/npm-tarballs
                   done
 

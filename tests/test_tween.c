@@ -334,6 +334,11 @@ static void test_seq_invalid(void)
     DTR_ASSERT(dtr_tween_seq_done(&twn, 999));
     DTR_ASSERT_NEAR(dtr_tween_seq_val(&twn, -1), 0.0, EPS);
 
+    /* Malformed active sequences cannot index outside the step array. */
+    twn.seqs[0].active     = true;
+    twn.seqs[0].step_count = CONSOLE_MAX_SEQ_STEPS + 1;
+    DTR_ASSERT_NEAR(dtr_tween_seq_val(&twn, 0), 0.0, EPS);
+
     /* Zero count fails */
     DTR_ASSERT_EQ_INT(dtr_tween_seq_add(&twn, NULL, NULL, NULL, NULL, 0), -1);
 

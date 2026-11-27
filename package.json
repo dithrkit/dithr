@@ -5,6 +5,7 @@
     "packages/wasm",
     "packages/win32-x64",
     "packages/linux-x64",
+    "packages/linux-arm64",
     "packages/darwin-arm64",
     "packages/create"
   ]

@@ -350,6 +350,10 @@ double dtr_tween_seq_val(dtr_tween_t *twn, int32_t seq_idx)
     if (seq_idx < 0 || seq_idx >= CONSOLE_MAX_TWEEN_SEQS || !twn->seqs[seq_idx].active) {
         return 0.0;
     }
+    if (twn->seqs[seq_idx].step_count <= 0 ||
+        twn->seqs[seq_idx].step_count > CONSOLE_MAX_SEQ_STEPS) {
+        return 0.0;
+    }
 
     /* Return value of the first non-done step, or last step if all done */
     for (step = 0; step < twn->seqs[seq_idx].step_count; ++step) {

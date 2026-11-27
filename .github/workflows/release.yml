@@ -24,7 +24,9 @@ jobs:
                   restore-keys: release-win-deps-
 
             - name: Configure
-              run: cmake --preset release
+              run: |
+                  $VERSION = $env:GITHUB_REF_NAME.Substring(1)
+                  cmake --preset release -DDTR_VERSION_STR=$VERSION
 
             - name: Build
               run: cmake --build build/release --config Release
@@ -92,7 +94,7 @@ jobs:
                   restore-keys: release-linux-deps-
 
             - name: Configure
-              run: cmake --preset release
+              run: cmake --preset release -DDTR_VERSION_STR=${GITHUB_REF_NAME#v}
 
             - name: Build
               run: cmake --build build/release --config Release
@@ -150,7 +152,7 @@ jobs:
                   until [ "$attempts" -ge 3 ]; do
                     attempts=$((attempts + 1))
                     echo "Configure attempt ${attempts}/3"
-                    if cmake --preset release; then
+                    if cmake --preset release -DDTR_VERSION_STR=${GITHUB_REF_NAME#v}; then
                       exit 0
                     fi
 
@@ -228,7 +230,7 @@ jobs:
                   restore-keys: release-linux-arm64-deps-
 
             - name: Configure
-              run: cmake --preset release
+              run: cmake --preset release -DDTR_VERSION_STR=${GITHUB_REF_NAME#v}
 
             - name: Build
               run: cmake --build build/release --config Release
@@ -287,7 +289,7 @@ jobs:
                   restore-keys: release-wasm-deps-
 
             - name: Configure
-              run: cmake --preset wasm -DDTR_WASM_CART_DIR=examples/hello_world
+              run: cmake --preset wasm -DDTR_WASM_CART_DIR= -DDTR_VERSION_STR=${GITHUB_REF_NAME#v}
 
             - name: Build
               run: cmake --build build/wasm
@@ -334,7 +336,7 @@ jobs:
 
             - uses: actions/setup-node@v6
               with:
-                  node-version: 24
+                  node-version: 26
                   registry-url: https://registry.npmjs.org
 
             - name: Remove setup-node auth token (OIDC handles auth)
@@ -355,6 +357,15 @@ jobs:
                   cp -r npm-linux-arm64/* packages/linux-arm64/
                   cp -r npm-darwin-arm64/* packages/darwin-arm64/
                   cp -r npm-wasm/* packages/wasm/
+
+            - name: Verify platform package contents
+              run: |
+                  test -s packages/win32-x64/bin/dithr.exe
+                  test -x packages/linux-x64/bin/dithr
+                  test -x packages/linux-arm64/bin/dithr
+                  test -x packages/darwin-arm64/bin/dithr
+                  test -s packages/wasm/bin/dithr.js
+                  test -s packages/wasm/bin/dithr.wasm
 
             - name: Set package versions from tag
               run: |

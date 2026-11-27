@@ -6,14 +6,14 @@ dithr uses CMake with presets for easy configuration. All library dependencies
 
 ## Prerequisites
 
-| Tool           | Minimum version                   | Notes                                                           |
-| -------------- | --------------------------------- | --------------------------------------------------------------- |
-| CMake          | 3.22.1                            |                                                                 |
-| C compiler     | MSVC 2019+, GCC 10+, or Clang 13+ | C11 support required                                            |
-| Git            | any                               | Used by FetchContent to clone dependencies                      |
-| Ninja          | 1.10+                             | Required for WASM presets; recommended for all builds           |
-| Node.js        | 18+                               | Optional — only needed for cart tooling and the WASM dev server |
-| Emscripten SDK | 3.x                               | Optional — only needed for WASM builds                          |
+| Tool           | Minimum version                   | Notes                                                      |
+| -------------- | --------------------------------- | ---------------------------------------------------------- |
+| CMake          | 3.22.1                            |                                                            |
+| C compiler     | MSVC 2019+, GCC 10+, or Clang 13+ | C11 support required                                       |
+| Git            | any                               | Used by FetchContent to clone dependencies                 |
+| Ninja          | 1.10+                             | Required for WASM presets; recommended for all builds      |
+| Node.js        | 22.14.0+                          | Node.js 26 LTS recommended; used for cart tooling and WASM |
+| Emscripten SDK | 3.x                               | Optional — only needed for WASM builds                     |
 
 ## Build presets
 
@@ -213,7 +213,7 @@ All console defaults can be overridden at configure time:
 | `DTR_TARGET_FPS`      | 60                     | Target framerate              |
 | `DTR_JS_HEAP_MB`      | 64                     | QuickJS heap limit (MB)       |
 | `DTR_JS_STACK_KB`     | 512                    | QuickJS stack limit (KB)      |
-| `DTR_VERSION_STR`     | `"0.1.0"`              | Engine version string         |
+| `DTR_VERSION_STR`     | `"0.2.0"`              | Engine version string         |
 | `DTR_DEV_BUILD`       | OFF                    | Enable developer features     |
 | `DTR_BUILD_EXAMPLES`  | ON                     | Build example projects        |
 | `DTR_BUILD_TESTS`     | ON                     | Build test suite              |

@@ -6,8 +6,6 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "rootDir": "src"
-  },
-  "include": ["src/**/*.ts", "node_modules/@dithrkit/sdk/types/**/*.d.ts"]
+    "skipLibCheck": true
+  }
 }

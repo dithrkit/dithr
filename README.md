@@ -41,7 +41,7 @@ in the browser via WebAssembly.
 ## Quick Start (npm)
 
 The fastest way to start making games with dithr. Requires
-[Node.js](https://nodejs.org/) >= 18.
+[Node.js](https://nodejs.org/) >= 22.14.0. Node.js 26 LTS is recommended.
 
 ### Create a project
 
@@ -116,13 +116,13 @@ For contributors or if you want to build the engine yourself.
 
 ### Prerequisites
 
-| Tool       | Version             | Notes                                       |
-| ---------- | ------------------- | ------------------------------------------- |
-| CMake      | >= 3.22.1           |                                             |
-| C compiler | MSVC, GCC, or Clang | C11                                         |
-| Git        | any                 | For FetchContent                            |
-| Node.js    | >= 18               | Optional — cart tooling and WASM dev server |
-| Emscripten | >= 3.x              | Optional — WASM builds only                 |
+| Tool       | Version             | Notes                                 |
+| ---------- | ------------------- | ------------------------------------- |
+| CMake      | >= 3.22.1           |                                       |
+| C compiler | MSVC, GCC, or Clang | C11                                   |
+| Git        | any                 | For FetchContent                      |
+| Node.js    | >= 22.14.0          | Optional — Node.js 26 LTS recommended |
+| Emscripten | >= 3.x              | Optional — WASM builds only           |
 
 All library dependencies (SDL3, SDL3_mixer, SDL3_image, QuickJS-NG) are
 fetched automatically by CMake.
