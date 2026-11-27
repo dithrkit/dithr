@@ -8,6 +8,7 @@
 
 #include "cart.h"
 #include "console_defs.h"
+#include "runtime.h"
 
 #include <SDL3/SDL.h>
 #include <stddef.h>
@@ -15,13 +16,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 /* libFuzzer entry point */
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    char        tmp_path[256];
-    FILE       *fp;
-    dtr_cart_t *cart;
+    char           tmp_path[256];
+    FILE          *fp;
+    dtr_cart_t    *cart;
+    dtr_runtime_t *runtime;
 
     /* Skip very large inputs to keep runs fast */
     if (size > 65536) {
@@ -38,11 +41,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     fclose(fp);
 
     /* Attempt to load — should either succeed or fail gracefully */
-    cart = dtr_cart_load(tmp_path);
-    if (cart != NULL) {
-        dtr_cart_destroy(cart);
+    runtime = dtr_runtime_create(NULL, CONSOLE_JS_HEAP_MB, CONSOLE_JS_STACK_KB);
+    cart    = dtr_cart_create();
+    if (runtime != NULL && cart != NULL) {
+        dtr_cart_load(cart, runtime->ctx, tmp_path);
     }
 
+    dtr_cart_destroy(cart);
+    dtr_runtime_destroy(runtime);
     remove(tmp_path);
     return 0;
 }

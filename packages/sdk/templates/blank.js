@@ -4,7 +4,7 @@ function _init() {
     gfx.cls(0);
 }
 
-function _update(dt) {
+function _update(_dt) {
     // Update logic here
 }
 

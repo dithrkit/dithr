@@ -50,8 +50,8 @@ typedef enum dtr_key {
     DTR_KEY_U,
     DTR_KEY_W,
     DTR_KEY_Y,
-    DTR_KEY_0,
-    DTR_KEY_1,
+    DTR_KEY_0, /* NOLINT(misc-confusable-identifiers) */
+    DTR_KEY_1, /* NOLINT(misc-confusable-identifiers) */
     DTR_KEY_2,
     DTR_KEY_3,
     DTR_KEY_4,

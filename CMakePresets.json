@@ -24,7 +24,8 @@
       "binaryDir": "${sourceDir}/build/release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "DTR_ENABLE_LTO": "ON"
+        "DTR_ENABLE_LTO": "ON",
+        "BUILD_SHARED_LIBS": "OFF"
       }
     },
     {

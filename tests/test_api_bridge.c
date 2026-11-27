@@ -1114,6 +1114,16 @@ static void test_tween_ease_endpoints(void)
     DTR_PASS();
 }
 
+static void test_tween_cancel_invalid(void)
+{
+    test_ctx_t *tc = prv_setup();
+
+    prv_register(tc, dtr_tween_api_register);
+    DTR_ASSERT(prv_eval_bool(tc, "tween.cancel(-1); true"));
+    prv_teardown(tc);
+    DTR_PASS();
+}
+
 static void test_tween_sequence_basic(void)
 {
     test_ctx_t *tc = prv_setup();
@@ -1621,9 +1631,10 @@ int main(void)
     DTR_RUN_TEST(test_touch_position);
     DTR_RUN_TEST(test_touch_released);
 
-    /* Tween API — 8 tests */
+    /* Tween API — 9 tests */
     DTR_RUN_TEST(test_tween_ease_linear);
     DTR_RUN_TEST(test_tween_ease_endpoints);
+    DTR_RUN_TEST(test_tween_cancel_invalid);
     DTR_RUN_TEST(test_tween_sequence_basic);
     DTR_RUN_TEST(test_tween_sequence_invalid);
     DTR_RUN_TEST(test_tween_parallel_basic);

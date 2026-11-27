@@ -4,11 +4,11 @@ export function _init(): void {
     gfx.cls(0);
 }
 
-export function _update(dt: number): void {
+export function _update(_dt: number): void {
     // Update logic here
 }
 
 export function _draw(): void {
     gfx.cls(0);
-    gfx.print('hello, dithr!', 4, 4, 7);
+    gfx.print("hello, dithr!", 4, 4, 7);
 }

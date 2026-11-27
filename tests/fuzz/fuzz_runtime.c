@@ -25,7 +25,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    rt = dtr_runtime_create(CONSOLE_JS_HEAP_MB, CONSOLE_JS_STACK_KB);
+    rt = dtr_runtime_create(NULL, CONSOLE_JS_HEAP_MB, CONSOLE_JS_STACK_KB);
     if (rt == NULL) {
         return 0;
     }
@@ -36,7 +36,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         memcpy(src, data, size);
         src[size] = '\0';
 
-        dtr_runtime_eval(rt, src, size);
+        dtr_runtime_eval(rt, src, size, "<fuzz>");
         SDL_free(src);
     }
 

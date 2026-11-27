@@ -241,7 +241,7 @@ static JSValue js_tween_cancel(JSContext *ctx, JSValueConst this_val, int argc, 
     idx = prv_get_id(ctx, argc, argv, 0);
 
     /* Reject the Promise if any */
-    if (prv_has_promise[idx]) {
+    if (idx >= 0 && idx < CONSOLE_MAX_TWEENS && prv_has_promise[idx]) {
         JSValue reason;
         JSValue ret;
 

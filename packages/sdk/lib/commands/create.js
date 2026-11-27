@@ -3,6 +3,7 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
+const { version: SDK_VERSION } = require("../../package.json");
 
 const TEMPLATES_DIR = path.join(__dirname, "..", "..", "templates");
 
@@ -102,7 +103,7 @@ if (useTypescript) {
     // tsconfig.json — extends the shared SDK config
     const tsconfig = {
         extends: "@dithrkit/sdk/configs/tsconfig.base.json",
-        include: ["src/**/*.ts"],
+        include: ["src/**/*.ts", "node_modules/@dithrkit/sdk/types/**/*.d.ts"],
     };
     fs.writeFileSync(path.join(dir, "tsconfig.json"), JSON.stringify(tsconfig, null, 4) + "\n");
 }
@@ -149,7 +150,7 @@ const pkg = {
         typecheck: useTypescript ? "tsc --noEmit" : undefined,
     },
     devDependencies: {
-        "@dithrkit/sdk": "^0.1.0",
+        "@dithrkit/sdk": `^${SDK_VERSION}`,
         eslint: "^9.0.0",
         prettier: "^3.0.0",
         ...(useTypescript

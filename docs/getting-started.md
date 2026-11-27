@@ -5,7 +5,7 @@ a project to exporting it for distribution.
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) >= 18
+- [Node.js](https://nodejs.org/) >= 22.14.0 (Node.js 26 LTS recommended)
 
 ## 1. Create a project
 
