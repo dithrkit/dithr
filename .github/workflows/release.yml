@@ -12,10 +12,10 @@ jobs:
     build-windows:
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Cache dependencies
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/release/_deps
@@ -68,7 +68,7 @@ jobs:
     build-linux:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Install dependencies
               run: |
@@ -85,7 +85,7 @@ jobs:
                     libdecor-0-dev
 
             - name: Cache dependencies
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/release/_deps
@@ -135,10 +135,10 @@ jobs:
     build-macos:
         runs-on: macos-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Cache dependencies
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/release/_deps
@@ -204,7 +204,7 @@ jobs:
     build-linux-arm64:
         runs-on: ubuntu-24.04-arm
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Install dependencies
               run: |
@@ -221,7 +221,7 @@ jobs:
                     libdecor-0-dev
 
             - name: Cache dependencies
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/release/_deps
@@ -271,7 +271,7 @@ jobs:
     build-wasm:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Setup Emscripten
               uses: emscripten-core/setup-emsdk@v16
@@ -280,7 +280,7 @@ jobs:
                   actions-cache-folder: emsdk-cache
 
             - name: Cache dependencies
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/wasm/_deps
@@ -332,9 +332,9 @@ jobs:
             contents: read
             id-token: write
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
-            - uses: actions/setup-node@v6
+            - uses: actions/setup-node@v7
               with:
                   node-version: 26
                   registry-url: https://registry.npmjs.org

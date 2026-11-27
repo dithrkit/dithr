@@ -13,7 +13,7 @@ jobs:
     formatting:
         runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Install clang-format-22
               run: |
@@ -37,9 +37,9 @@ jobs:
     js-lint:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
-            - uses: actions/setup-node@v6
+            - uses: actions/setup-node@v7
               with:
                   node-version: 26
 
@@ -61,10 +61,10 @@ jobs:
     clang-tidy:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Cache build
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/debug/_deps
@@ -102,10 +102,10 @@ jobs:
     windows:
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Cache build
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/debug/_deps
@@ -163,10 +163,10 @@ jobs:
             SDL_AUDIODRIVER: dummy
             SDL_VIDEODRIVER: dummy
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Cache build
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       ${{ matrix.build-dir }}/_deps
@@ -208,10 +208,10 @@ jobs:
             SDL_AUDIODRIVER: dummy
             SDL_VIDEODRIVER: dummy
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Cache build
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/coverage/_deps
@@ -297,10 +297,10 @@ jobs:
             SDL_AUDIODRIVER: dummy
             SDL_VIDEODRIVER: dummy
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Cache build
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       ${{ matrix.build-dir }}/_deps
@@ -330,14 +330,14 @@ jobs:
     wasm:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Install Ninja
               run: sudo apt-get update && sudo apt-get install -y ninja-build
 
             - name: Cache emsdk
               id: cache-emsdk
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: emsdk
                   key: emsdk-5.0.6-${{ runner.os }}
@@ -359,7 +359,7 @@ jobs:
                   echo "EMSDK=${{ github.workspace }}/emsdk" >> $GITHUB_ENV
 
             - name: Cache build
-              uses: actions/cache@v5
+              uses: actions/cache@v6
               with:
                   path: |
                       build/wasm/_deps
@@ -415,7 +415,7 @@ jobs:
         runs-on: ubuntu-24.04
         needs: wasm
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Download WASM build
               uses: actions/download-artifact@v8
@@ -424,15 +424,34 @@ jobs:
                   path: build/wasm
 
             - name: Setup Node.js
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v7
               with:
                   node-version: 26
 
-            - name: Install Playwright
+            - name: Install Node dependencies
               working-directory: tests/wasm-browser
-              run: |
-                  npm ci
-                  npx playwright install --with-deps chromium
+              run: npm ci
+
+            - name: Cache Playwright browsers
+              id: playwright-cache
+              uses: actions/cache@v6
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tests/wasm-browser/package-lock.json') }}
+
+            - name: Install Playwright system dependencies
+              working-directory: tests/wasm-browser
+              timeout-minutes: 8
+              run: npx playwright install-deps chromium
+
+            - name: Install Playwright browser
+              if: steps.playwright-cache.outputs.cache-hit != 'true'
+              working-directory: tests/wasm-browser
+              timeout-minutes: 8
+              env:
+                  DEBUG: pw:install
+                  PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: 120000
+              run: npx playwright install chromium
 
             - name: Run browser smoke test
               working-directory: tests/wasm-browser
@@ -444,9 +463,9 @@ jobs:
     npm-packages:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
-            - uses: actions/setup-node@v6
+            - uses: actions/setup-node@v7
               with:
                   node-version: 26
 
