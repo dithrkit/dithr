@@ -451,7 +451,7 @@ jobs:
               env:
                   DEBUG: pw:install
                   PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: 120000
-              run: npx playwright install chromium
+              run: npx playwright install --only-shell chromium
 
             - name: Run browser smoke test
               working-directory: tests/wasm-browser
