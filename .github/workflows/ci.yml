@@ -11,7 +11,7 @@ jobs:
     #  Formatting — clang-format check
     # ---------------------------------------------------------------------------
     formatting:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v6
 
@@ -412,7 +412,7 @@ jobs:
     #  WASM browser smoke test — load in headless Chromium via Playwright
     # ---------------------------------------------------------------------------
     wasm-browser:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         needs: wasm
         steps:
             - uses: actions/checkout@v6
