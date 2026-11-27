@@ -358,10 +358,14 @@ jobs:
                   cp npm-linux-arm64/bin/* packages/linux-arm64/bin/
                   cp npm-darwin-arm64/bin/* packages/darwin-arm64/bin/
                   cp npm-wasm/bin/* packages/wasm/bin/
+                  chmod 0755 \
+                      packages/linux-x64/bin/dithr \
+                      packages/linux-arm64/bin/dithr \
+                      packages/darwin-arm64/bin/dithr
 
             - name: Verify platform package contents
               run: |
-                  find packages/{win32-x64,linux-x64,linux-arm64,darwin-arm64,wasm}/bin -maxdepth 2 -type f -print
+                  find packages/{win32-x64,linux-x64,linux-arm64,darwin-arm64,wasm}/bin -maxdepth 2 -type f -printf '%m %p\n'
                   test -s packages/win32-x64/bin/dithr.exe
                   test -x packages/linux-x64/bin/dithr
                   test -x packages/linux-arm64/bin/dithr
