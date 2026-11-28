@@ -105,6 +105,16 @@ jobs:
             - name: Build
               run: cmake --build build/wasm
 
+            - name: Check cart payload size
+              run: |
+                  test -s build/wasm/dithr.data
+                  DATA_SIZE=$(stat -c%s build/wasm/dithr.data)
+                  echo "Embedded cart size: ${DATA_SIZE} bytes"
+                  if [ "$DATA_SIZE" -gt 10485760 ]; then
+                    echo "::error::Embedded cart exceeds 10 MiB; check for node_modules or tooling files."
+                    exit 1
+                  fi
+
             - name: Stage output
               run: |
                   mkdir -p site/${{ matrix.example }}

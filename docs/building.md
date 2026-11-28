@@ -213,7 +213,7 @@ All console defaults can be overridden at configure time:
 | `DTR_TARGET_FPS`      | 60                     | Target framerate              |
 | `DTR_JS_HEAP_MB`      | 64                     | QuickJS heap limit (MB)       |
 | `DTR_JS_STACK_KB`     | 512                    | QuickJS stack limit (KB)      |
-| `DTR_VERSION_STR`     | `"0.2.0"`              | Engine version string         |
+| `DTR_VERSION_STR`     | `"0.5.1"`              | Engine version string         |
 | `DTR_DEV_BUILD`       | OFF                    | Enable developer features     |
 | `DTR_BUILD_EXAMPLES`  | ON                     | Build example projects        |
 | `DTR_BUILD_TESTS`     | ON                     | Build test suite              |

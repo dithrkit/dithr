@@ -63,7 +63,7 @@ void dtr_cart_defaults(dtr_cart_t *cart)
 
     /* Meta defaults */
     SDL_strlcpy(cart->meta.title, "Untitled", sizeof(cart->meta.title));
-    SDL_strlcpy(cart->meta.version, "0.1.0", sizeof(cart->meta.version));
+    cart->meta.version[0] = '\0';
 }
 
 /* ------------------------------------------------------------------ */
@@ -160,7 +160,7 @@ bool dtr_cart_parse(dtr_cart_t *cart, JSContext *ctx, const char *json, size_t l
     /* --- meta (flat at root level) --- */
     prv_json_str(ctx, root, "title", cart->meta.title, sizeof(cart->meta.title), "Untitled");
     prv_json_str(ctx, root, "author", cart->meta.author, sizeof(cart->meta.author), "");
-    prv_json_str(ctx, root, "version", cart->meta.version, sizeof(cart->meta.version), "0.1.0");
+    prv_json_str(ctx, root, "version", cart->meta.version, sizeof(cart->meta.version), "");
     prv_json_str(
         ctx, root, "description", cart->meta.description, sizeof(cart->meta.description), "");
     prv_json_str(ctx, root, "id", cart->meta.id, sizeof(cart->meta.id), "");

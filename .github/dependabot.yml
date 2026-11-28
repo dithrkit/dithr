@@ -4,3 +4,11 @@ updates:
       directory: /
       schedule:
           interval: monthly
+    - package-ecosystem: npm
+      directory: /packages/sdk
+      schedule:
+          interval: monthly
+    - package-ecosystem: npm
+      directory: /tests/wasm-browser
+      schedule:
+          interval: monthly

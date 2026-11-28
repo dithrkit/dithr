@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 
 project(dithr
-    VERSION 0.2.0
+    VERSION 0.5.1
     DESCRIPTION "Fantasy console engine for building retro games"
     LANGUAGES C
 )
@@ -130,7 +130,7 @@ set(DTR_AUDIO_BUFFER      2048  CACHE STRING "Audio buffer size")
 set(DTR_TARGET_FPS        60    CACHE STRING "Target framerate")
 set(DTR_JS_HEAP_MB        64    CACHE STRING "JS heap size in MB")
 set(DTR_JS_STACK_KB       512   CACHE STRING "JS stack size in KB")
-set(DTR_VERSION_STR       "0.2.0" CACHE STRING "Engine version string")
+set(DTR_VERSION_STR       "0.5.1" CACHE STRING "Engine version string")
 
 # --- Dependencies ---
 include(FetchContent)

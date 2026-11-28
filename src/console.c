@@ -403,7 +403,7 @@ dtr_console_t *dtr_console_create(const char *cart_path)
     SDL_SetAppMetadata(con->cart->meta.title[0] != '\0' ? con->cart->meta.title : "dithr",
                        con->cart->meta.version[0] != '\0' ? con->cart->meta.version :
                                                             CONSOLE_VERSION,
-                       con->cart->meta.id[0] != '\0' ? con->cart->meta.id : "com.example.tbd");
+                       con->cart->meta.id[0] != '\0' ? con->cart->meta.id : "com.dithrkit.dithr");
 
     /* --- Apply framebuffer dimensions --- */
     con->fb_width   = con->cart->display.width;

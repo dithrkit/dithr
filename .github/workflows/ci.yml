@@ -513,4 +513,3 @@ jobs:
             - name: Audit dependencies
               run: >
                   npm audit --audit-level=high --omit=optional --prefix packages/sdk
-              continue-on-error: true

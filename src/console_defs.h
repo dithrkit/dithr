@@ -85,7 +85,7 @@
 #define CONSOLE_JS_STACK_KB 512
 #endif
 #ifndef CONSOLE_VERSION
-#define CONSOLE_VERSION "0.1.0"
+#define CONSOLE_VERSION "0.5.1"
 #endif
 
 /* Convenience aliases used by subsystem code */

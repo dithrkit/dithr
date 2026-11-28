@@ -51,6 +51,7 @@ static void test_cart_defaults(void)
     assert(cart->audio.frequency == CONSOLE_AUDIO_FREQ);
     assert(cart->sprites.tile_w == CONSOLE_TILE_W);
     assert(strcmp(cart->meta.title, "Untitled") == 0);
+    assert(cart->meta.version[0] == '\0');
     dtr_cart_destroy(cart);
     printf("  PASS test_cart_defaults\n");
 }
@@ -72,6 +73,7 @@ static void test_cart_parse_minimal(void)
     /* Should keep defaults */
     assert(cart->display.width == CONSOLE_FB_WIDTH);
     assert(cart->timing.fps == CONSOLE_FPS);
+    assert(cart->meta.version[0] == '\0');
     prv_teardown();
     dtr_cart_destroy(cart);
     printf("  PASS test_cart_parse_minimal\n");
