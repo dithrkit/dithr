@@ -61,24 +61,32 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     const canvas = page.locator("canvas#canvas");
     await expect(canvas).toBeVisible({ timeout: 15000 });
 
-    // Wait for Emscripten module to initialise — the splash overlay hides
-    // when loading completes. Give it time for WASM compilation + data fetch.
-    await page.waitForFunction(
-        () => {
-            const splash = document.getElementById("splash");
-            return splash && splash.classList.contains("hidden");
-        },
-        { timeout: 30000 },
-    );
-
     expect
         .poll(() => consoleLogs.some((line) => line.includes("loading /cart/cart.json")), {
-            timeout: 15000,
+            timeout: 30000,
         })
         .toBe(true);
     expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
     expect(errors).toEqual([]);
     expect(failedRequests).toEqual([]);
+
+    const splash = page.locator("#splash");
+    await page.waitForFunction(
+        () => {
+            const overlay = document.getElementById("splash");
+            const touchStart = document.getElementById("touch-start");
+            return (
+                overlay?.classList.contains("hidden") ||
+                (touchStart && getComputedStyle(touchStart).display !== "none")
+            );
+        },
+        null,
+        { timeout: 30000 },
+    );
+    if (await splash.isVisible()) {
+        await splash.click();
+    }
+    await expect(splash).toBeHidden({ timeout: 5000 });
 
     await expect
         .poll(
