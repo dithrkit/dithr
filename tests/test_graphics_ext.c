@@ -181,7 +181,10 @@ static void test_gfx_dissolve_pixels(void)
     DTR_ASSERT(changed > 0);
     DTR_ASSERT(dtr_gfx_transitioning(gfx));
 
-    /* Frame 2: t=2/3, more pixels should change */
+    /* Frame 2: simulate a freshly flipped framebuffer. */
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        pixels[idx] = 0xFFFFFFFF;
+    }
     dtr_gfx_transition_update_buf(gfx, pixels);
     {
         int32_t changed2;
@@ -192,14 +195,63 @@ static void test_gfx_dissolve_pixels(void)
                 ++changed2;
             }
         }
-        DTR_ASSERT(changed2 >= changed);
+        DTR_ASSERT(changed2 > changed);
     }
 
-    /* Frame 3: transition completes */
+    /* Frame 3: transition completes with the full frame covered. */
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        pixels[idx] = 0xFFFFFFFF;
+    }
     dtr_gfx_transition_update_buf(gfx, pixels);
     DTR_ASSERT(!dtr_gfx_transitioning(gfx));
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        DTR_ASSERT_EQ_INT(pixels[idx], target);
+    }
 
     dtr_gfx_destroy(gfx);
+    DTR_PASS();
+}
+
+static void test_gfx_dissolve_reverse_pixels(void)
+{
+    dtr_graphics_t *gfx     = dtr_gfx_create(4, 4);
+    dtr_graphics_t *reverse = dtr_gfx_create(4, 4);
+    uint32_t        out_pixels[16];
+    uint32_t        in_pixels[16];
+    uint32_t        target;
+
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        out_pixels[idx] = 0xFFFFFFFF;
+        in_pixels[idx]  = 0xFFFFFFFF;
+    }
+    target = gfx->colors[0];
+
+    dtr_gfx_dissolve(gfx, 0, 2);
+    dtr_gfx_dissolve_reverse(reverse, 0, 2);
+    dtr_gfx_transition_update_buf(gfx, out_pixels);
+    dtr_gfx_transition_update_buf(reverse, in_pixels);
+
+    /* Reverse reveal exposes exactly the same pixels covered by dissolve-out. */
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        DTR_ASSERT((out_pixels[idx] == target) == (in_pixels[idx] != target));
+    }
+
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        out_pixels[idx] = 0xFFFFFFFF;
+    }
+    dtr_gfx_transition_update_buf(gfx, out_pixels);
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        in_pixels[idx] = 0xFFFFFFFF;
+    }
+    dtr_gfx_transition_update_buf(reverse, in_pixels);
+    DTR_ASSERT(!dtr_gfx_transitioning(reverse));
+    for (int32_t idx = 0; idx < 16; ++idx) {
+        DTR_ASSERT(out_pixels[idx] == target);
+        DTR_ASSERT(in_pixels[idx] != target);
+    }
+
+    dtr_gfx_destroy(gfx);
+    dtr_gfx_destroy(reverse);
     DTR_PASS();
 }
 
@@ -756,6 +808,7 @@ int main(int argc, char *argv[])
     DTR_RUN_TEST(test_gfx_wipe_up_pixels);
     DTR_RUN_TEST(test_gfx_wipe_down_pixels);
     DTR_RUN_TEST(test_gfx_dissolve_pixels);
+    DTR_RUN_TEST(test_gfx_dissolve_reverse_pixels);
     DTR_RUN_TEST(test_gfx_transition_none_noop);
     DTR_RUN_TEST(test_gfx_flip_to);
     DTR_RUN_TEST(test_gfx_palt);

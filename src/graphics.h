@@ -60,13 +60,13 @@ typedef enum dtr_wipe_dir {
  */
 typedef struct dtr_transition {
     dtr_transition_type_t type;
-    int32_t               frame;          /**< Current frame of the transition */
-    int32_t               duration;       /**< Total frames for the transition */
-    uint8_t               color;          /**< Target colour for fade/dissolve */
-    dtr_wipe_dir_t        direction;      /**< Wipe direction */
-    uint32_t             *dissolve_order; /**< Pre-sorted pixel offsets */
-    int32_t               dissolve_count; /**< Total pixels in order table */
-    int32_t               dissolve_done;  /**< Pixels filled so far */
+    int32_t               frame;            /**< Current frame of the transition */
+    int32_t               duration;         /**< Total frames for the transition */
+    uint8_t               color;            /**< Target colour for fade/dissolve */
+    dtr_wipe_dir_t        direction;        /**< Wipe direction */
+    uint32_t             *dissolve_order;   /**< Pre-sorted pixel offsets */
+    int32_t               dissolve_count;   /**< Total pixels in order table */
+    bool                  dissolve_reverse; /**< Reveal the scene instead of covering it */
 } dtr_transition_t;
 
 /* ------------------------------------------------------------------------ */
@@ -463,6 +463,7 @@ void dtr_gfx_flip(dtr_graphics_t *gfx);
 void dtr_gfx_fade(dtr_graphics_t *gfx, uint8_t color, int32_t frames);
 void dtr_gfx_wipe(dtr_graphics_t *gfx, int32_t direction, uint8_t color, int32_t frames);
 void dtr_gfx_dissolve(dtr_graphics_t *gfx, uint8_t color, int32_t frames);
+void dtr_gfx_dissolve_reverse(dtr_graphics_t *gfx, uint8_t color, int32_t frames);
 bool dtr_gfx_transitioning(dtr_graphics_t *gfx);
 void dtr_gfx_transition_update_buf(dtr_graphics_t *gfx, uint32_t *pixels);
 void dtr_gfx_transition_update(dtr_graphics_t *gfx);

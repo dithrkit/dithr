@@ -740,8 +740,15 @@ static JSValue js_gfx_wipe(JSContext *ctx, JSValueConst this_val, int argc, JSVa
 static JSValue js_gfx_dissolve(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
     (void)this_val;
-    dtr_gfx_dissolve(
-        GFX(ctx), dtr_api_opt_u8(ctx, argc, argv, 0, 0), dtr_api_opt_int(ctx, argc, argv, 1, 30));
+    if (argc >= 3 && JS_ToBool(ctx, argv[2])) {
+        dtr_gfx_dissolve_reverse(GFX(ctx),
+                                 dtr_api_opt_u8(ctx, argc, argv, 0, 0),
+                                 dtr_api_opt_int(ctx, argc, argv, 1, 30));
+    } else {
+        dtr_gfx_dissolve(GFX(ctx),
+                         dtr_api_opt_u8(ctx, argc, argv, 0, 0),
+                         dtr_api_opt_int(ctx, argc, argv, 1, 30));
+    }
     return JS_UNDEFINED;
 }
 
@@ -1275,7 +1282,7 @@ static const JSCFunctionListEntry js_gfx_funcs[] = {
     JS_CFUNC_DEF("exportPNG", 1, js_gfx_export_png),
     JS_CFUNC_DEF("fade", 2, js_gfx_fade),
     JS_CFUNC_DEF("wipe", 3, js_gfx_wipe),
-    JS_CFUNC_DEF("dissolve", 2, js_gfx_dissolve),
+    JS_CFUNC_DEF("dissolve", 3, js_gfx_dissolve),
     JS_CFUNC_DEF("transitioning", 0, js_gfx_transitioning),
     JS_CFUNC_DEF("dlBegin", 0, js_gfx_dl_begin),
     JS_CFUNC_DEF("dlEnd", 0, js_gfx_dl_end),

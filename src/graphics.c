@@ -115,7 +115,8 @@ void dtr_gfx_reset(dtr_graphics_t *gfx)
         DTR_FREE(gfx->transition.dissolve_order);
         gfx->transition.dissolve_order = NULL;
     }
-    gfx->transition.type = DTR_TRANS_NONE;
+    gfx->transition.type             = DTR_TRANS_NONE;
+    gfx->transition.dissolve_reverse = false;
 
     gfx->color        = 7;
     gfx->cursor_x     = 0;

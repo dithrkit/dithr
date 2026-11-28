@@ -98,7 +98,14 @@ export function _update(dt: number): void {
         if (holdTimer <= 0) {
             phase = 'in';
             inFrame = 0;
+            if (transitionType === 5) {
+                gfx.dissolve(0, transFrames, true);
+            }
         }
+    }
+
+    if (phase === 'in' && transitionType === 5 && !gfx.transitioning()) {
+        phase = 'idle';
     }
 
     if (phase !== 'idle') return;
@@ -168,21 +175,21 @@ export function _draw(): void {
         gfx.rectfill(0, 0, 319, 179, 0);
     }
 
-    // Manual "in" overlay — draw shrinking black mask over the new scene
-    if (phase === 'in') {
+    // Manual "in" overlay — dissolve-in is handled by the engine transition.
+    if (phase === 'in' && transitionType !== 5) {
         inFrame++;
         const t = math.min(inFrame / transFrames, 1.0); // 0→1 = fully black → fully clear
         if (inFrame >= transFrames) phase = 'idle';
 
         // Dithered pattern table: each entry is a fill pattern with decreasing
-        // coverage, used for fade-in and dissolve-in alike.
+        // coverage, used for fade-in.
         const patterns = [
             0xffff, 0x7fff, 0x7fbf, 0x7baf, 0x5aaf, 0x5aa5, 0x5a25, 0x5224, 0x5024, 0x4024, 0x4020,
             0x0020, 0x0400,
         ];
 
-        if (transitionType === 0 || transitionType === 5) {
-            // ── Fade / Dissolve in: dithered overlay that thins out ──
+        if (transitionType === 0) {
+            // ── Fade in: dithered overlay that thins out ──
             const level = math.flr(t * (patterns.length + 1));
             if (level < patterns.length) {
                 gfx.fillp(patterns[level]);

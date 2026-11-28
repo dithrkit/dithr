@@ -43,7 +43,7 @@ void dtr_gfx_wipe(dtr_graphics_t *gfx, int32_t direction, uint8_t color, int32_t
     gfx->transition.frame     = 0;
 }
 
-void dtr_gfx_dissolve(dtr_graphics_t *gfx, uint8_t color, int32_t frames)
+static void prv_gfx_dissolve(dtr_graphics_t *gfx, uint8_t color, int32_t frames, bool reverse)
 {
     int32_t   total;
     uint32_t *order;
@@ -83,13 +83,23 @@ void dtr_gfx_dissolve(dtr_graphics_t *gfx, uint8_t color, int32_t frames)
         }
     }
 
-    gfx->transition.type           = DTR_TRANS_DISSOLVE;
-    gfx->transition.color          = color;
-    gfx->transition.duration       = frames;
-    gfx->transition.frame          = 0;
-    gfx->transition.dissolve_order = order;
-    gfx->transition.dissolve_count = total;
-    gfx->transition.dissolve_done  = 0;
+    gfx->transition.type             = DTR_TRANS_DISSOLVE;
+    gfx->transition.color            = color;
+    gfx->transition.duration         = frames;
+    gfx->transition.frame            = 0;
+    gfx->transition.dissolve_order   = order;
+    gfx->transition.dissolve_count   = total;
+    gfx->transition.dissolve_reverse = reverse;
+}
+
+void dtr_gfx_dissolve(dtr_graphics_t *gfx, uint8_t color, int32_t frames)
+{
+    prv_gfx_dissolve(gfx, color, frames, false);
+}
+
+void dtr_gfx_dissolve_reverse(dtr_graphics_t *gfx, uint8_t color, int32_t frames)
+{
+    prv_gfx_dissolve(gfx, color, frames, true);
 }
 
 bool dtr_gfx_transitioning(dtr_graphics_t *gfx)
@@ -209,8 +219,8 @@ void dtr_gfx_transition_update_buf(dtr_graphics_t *gfx, uint32_t *pixels)
         }
 
         case DTR_TRANS_DISSOLVE: {
-            /* Incremental dissolve using pre-sorted permutation table.
-             * Each frame only writes the newly-revealed pixels. */
+            /* Dissolve-out fills newly-covered pixels incrementally.
+             * Dissolve-in masks pixels that have not been revealed. */
             uint32_t col_rgba;
             int32_t  target;
 
@@ -221,10 +231,17 @@ void dtr_gfx_transition_update_buf(dtr_graphics_t *gfx, uint32_t *pixels)
             }
 
             if (tr->dissolve_order != NULL) {
-                for (int32_t i = tr->dissolve_done; i < target; ++i) {
-                    pixels[tr->dissolve_order[i]] = col_rgba;
+                if (tr->dissolve_reverse) {
+                    for (int32_t i = target; i < tr->dissolve_count; ++i) {
+                        pixels[tr->dissolve_order[i]] = col_rgba;
+                    }
+                } else {
+                    /* The frame buffer is replaced every render, so repaint the
+                     * complete covered prefix rather than only new pixels. */
+                    for (int32_t i = 0; i < target; ++i) {
+                        pixels[tr->dissolve_order[i]] = col_rgba;
+                    }
                 }
-                tr->dissolve_done = target;
             } else {
                 /* Fallback: no table (malloc failed) — use hash */
                 uint32_t threshold;
@@ -232,7 +249,10 @@ void dtr_gfx_transition_update_buf(dtr_graphics_t *gfx, uint32_t *pixels)
                 threshold = (uint32_t)(t * 4294967295.0f);
                 for (int32_t y_px = 0; y_px < gfx->height; ++y_px) {
                     for (int32_t x_px = 0; x_px < gfx->width; ++x_px) {
-                        if (prv_hash_pixel(x_px, y_px, 42) <= threshold) {
+                        bool covered;
+
+                        covered = prv_hash_pixel(x_px, y_px, 42) <= threshold;
+                        if (covered != tr->dissolve_reverse) {
                             pixels[y_px * gfx->width + x_px] = col_rgba;
                         }
                     }

@@ -315,6 +315,19 @@ static void test_gfx_fget_fset(void)
     DTR_PASS();
 }
 
+static void test_gfx_dissolve_reverse(void)
+{
+    test_ctx_t *tc = prv_setup();
+
+    prv_register(tc, dtr_gfx_api_register);
+    prv_eval_void(tc, "gfx.dissolve(0, 10, true)");
+    DTR_ASSERT(tc->con.graphics->transition.type == DTR_TRANS_DISSOLVE);
+    DTR_ASSERT(tc->con.graphics->transition.dissolve_reverse);
+    DTR_ASSERT(prv_eval_bool(tc, "gfx.transitioning()"));
+    prv_teardown(tc);
+    DTR_PASS();
+}
+
 /* ================================================================== */
 /*  Camera API tests                                                   */
 /* ================================================================== */
@@ -486,6 +499,7 @@ int main(void)
     DTR_RUN_TEST(test_gfx_peek_poke);
     DTR_RUN_TEST(test_gfx_color);
     DTR_RUN_TEST(test_gfx_fget_fset);
+    DTR_RUN_TEST(test_gfx_dissolve_reverse);
 
     /* Camera API — 2 tests */
     DTR_RUN_TEST(test_cam_set_get);

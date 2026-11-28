@@ -146,7 +146,7 @@ interface DithrGfx {
     // Screen transitions
     fade(col?: number, frames?: number): void;
     wipe(dir?: number, col?: number, frames?: number): void;
-    dissolve(col?: number, frames?: number): void;
+    dissolve(col?: number, frames?: number, reverse?: boolean): void;
     transitioning(): boolean;
 
     // Draw list (sprite batch)

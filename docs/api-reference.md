@@ -261,12 +261,12 @@ Transitions overlay the framebuffer after flip and run for a fixed number of
 frames. Only one transition is active at a time — starting a new one replaces
 the current.
 
-| Function        | Parameters            | Returns | Description                                                         |
-| --------------- | --------------------- | ------- | ------------------------------------------------------------------- |
-| `fade`          | `col?, frames?`       | —       | Fade the screen towards palette colour `col` over `frames` (def 30) |
-| `wipe`          | `dir?, col?, frames?` | —       | Wipe from one edge. Directions: 0=left, 1=right, 2=up, 3=down       |
-| `dissolve`      | `col?, frames?`       | —       | Random pixel dissolve towards `col` over `frames` (def 30)          |
-| `transitioning` |                       | `bool`  | Is a transition currently playing?                                  |
+| Function        | Parameters                | Returns | Description                                                         |
+| --------------- | ------------------------- | ------- | ------------------------------------------------------------------- |
+| `fade`          | `col?, frames?`           | —       | Fade the screen towards palette colour `col` over `frames` (def 30) |
+| `wipe`          | `dir?, col?, frames?`     | —       | Wipe from one edge. Directions: 0=left, 1=right, 2=up, 3=down       |
+| `dissolve`      | `col?, frames?, reverse?` | —       | Random pixel dissolve; `reverse` reveals the new scene              |
+| `transitioning` |                           | `bool`  | Is a transition currently playing?                                  |
 
 ### Draw list (sprite batch)
 
