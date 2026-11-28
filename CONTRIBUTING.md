@@ -73,6 +73,24 @@ The engine exposes JS namespaces (e.g. `gfx`, `sfx`, `col`). To add one:
 - Follow the existing code style (see above).
 - Update documentation if you add or change API surface.
 
+## Releasing
+
+Release tags run the full cross-platform build, GitHub asset publication, npm
+publication, and post-publish consumer verification. For a patch release:
+
+1. Release `vX.Y.Z-rc.1` and confirm all seven npm packages appear on `next`.
+2. Confirm the RC GitHub assets and `SHA256SUMS` pass the verification job.
+3. Run the RC through the JavaScript and TypeScript consumer flows.
+4. Release `vX.Y.Z`; confirm npm `latest`, GitHub assets, and Pages.
+
+If a published release is faulty:
+
+1. Do not overwrite or reuse its tag/version.
+2. Deprecate the affected npm version with a corrective message:
+   `npm deprecate @dithrkit/<package>@X.Y.Z "Broken release; use X.Y.Z+1."`
+3. Mark the GitHub release as superseded and document the known issue.
+4. Fix forward, release a new RC, and publish the next patch version.
+
 ## Running Examples
 
 After building, run any example cart:

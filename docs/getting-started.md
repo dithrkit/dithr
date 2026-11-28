@@ -7,6 +7,15 @@ a project to exporting it for distribution.
 
 - [Node.js](https://nodejs.org/) >= 22.14.0 (Node.js 26 LTS recommended)
 
+Supported prebuilt native runtimes:
+
+| Platform | Architecture | Baseline |
+| -------- | ------------ | -------- |
+| Windows  | x64          | Windows 10 or newer |
+| macOS    | ARM64        | Current GitHub Actions macOS baseline |
+| Linux    | x64          | glibc 2.35+ |
+| Linux    | ARM64        | glibc 2.39+ |
+
 ## 1. Create a project
 
 ```bash

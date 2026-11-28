@@ -43,6 +43,11 @@ in the browser via WebAssembly.
 The fastest way to start making games with dithr. Requires
 [Node.js](https://nodejs.org/) >= 22.14.0. Node.js 26 LTS is recommended.
 
+Prebuilt native runtimes are currently published for Windows x64, Linux x64,
+Linux ARM64, and macOS ARM64. The Linux x64 release binary is built on Ubuntu
+22.04 for compatibility with glibc 2.35 and newer; Linux ARM64 uses the Ubuntu
+24.04 ARM runner.
+
 ### Create a project
 
 ```bash

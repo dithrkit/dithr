@@ -370,6 +370,8 @@ jobs:
                   tar xzf dist/dithr-linux-x64.tar.gz -C dist/linux
                   test -x dist/linux/dithr
                   dist/linux/dithr --version 2>&1 | grep -F "${GITHUB_REF_NAME#v}"
+                  ! readelf --version-info dist/linux/dithr \
+                    | grep -Eq 'GLIBC_(2\.3[6-9]|2\.[4-9][0-9]|[3-9]\.)'
 
     publish-npm:
         needs: [build-windows, build-linux, build-linux-arm64, build-macos, build-wasm]
