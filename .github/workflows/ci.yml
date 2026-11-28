@@ -475,6 +475,9 @@ jobs:
             - name: Test SDK package
               run: npm test --prefix packages/sdk
 
+            - name: Test Pages cart staging
+              run: node --test tools/stage-cart.test.js
+
             - name: Pack all packages
               run: |
                   mkdir -p build/npm-tarballs

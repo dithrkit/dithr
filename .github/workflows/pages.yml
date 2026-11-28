@@ -59,6 +59,9 @@ jobs:
                   npm ci --ignore-scripts
                   npm run build
 
+            - name: Stage cart
+              run: node tools/stage-cart.js "examples/${{ matrix.example }}" "$RUNNER_TEMP/dithr-cart"
+
             - name: Install Ninja
               run: |
                   sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/sources.list.d/azure-cli.list
@@ -97,7 +100,7 @@ jobs:
             - name: Configure
               run: >
                   cmake --preset wasm
-                  -DDTR_WASM_CART_DIR=${{ github.workspace }}/examples/${{ matrix.example }}
+                  -DDTR_WASM_CART_DIR=$RUNNER_TEMP/dithr-cart
 
             - name: Build
               run: cmake --build build/wasm
