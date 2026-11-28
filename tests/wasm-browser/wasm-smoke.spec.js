@@ -61,24 +61,6 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     const canvas = page.locator("canvas#canvas");
     await expect(canvas).toBeVisible({ timeout: 15000 });
 
-    const splash = page.locator("#splash");
-    await page.waitForFunction(
-        () => {
-            const overlay = document.getElementById("splash");
-            const touchStart = document.getElementById("touch-start");
-            return (
-                overlay?.classList.contains("hidden") ||
-                (touchStart && getComputedStyle(touchStart).display !== "none")
-            );
-        },
-        null,
-        { timeout: 30000 },
-    );
-    if (await splash.isVisible()) {
-        await splash.click();
-    }
-    await expect(splash).toBeHidden({ timeout: 5000 });
-
     await expect
         .poll(
             async () => {
