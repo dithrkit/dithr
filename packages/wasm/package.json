@@ -1,6 +1,6 @@
 {
   "name": "@dithrkit/wasm",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Prebuilt dithr WASM runtime for web exports",
   "license": "MIT",
   "author": "dithrkit",

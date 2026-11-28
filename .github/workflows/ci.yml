@@ -127,7 +127,7 @@ jobs:
     #  Linux — GCC / Clang build matrix
     # ---------------------------------------------------------------------------
     linux:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         strategy:
             fail-fast: false
             matrix:
@@ -346,6 +346,16 @@ jobs:
         steps:
             - uses: actions/checkout@v7
 
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 26
+
+            - name: Build smoke-test cart
+              working-directory: examples/hello_world
+              run: |
+                  npm ci --ignore-scripts
+                  npm run build
+
             - name: Install Ninja
               run: sudo apt-get update && sudo apt-get install -y ninja-build
 
@@ -403,6 +413,31 @@ jobs:
                   path: |
                       build/wasm/dithr.*
                       build/wasm/index.html
+                  retention-days: 1
+
+            - name: Configure cart-free WASM package build
+              run: >
+                  cmake --preset wasm
+                  -B build/wasm-package
+                  -DDTR_WASM_CART_DIR=
+                  -DCMAKE_C_COMPILER_LAUNCHER=ccache
+
+            - name: Build cart-free WASM package
+              run: cmake --build build/wasm-package
+
+            - name: Verify cart-free WASM package
+              run: |
+                  strings build/wasm-package/dithr.wasm | grep -Fxq '/cart/cart.json'
+                  test ! -e build/wasm-package/dithr.data
+                  test ! -e build/wasm-package/dithr.data.js
+
+            - name: Upload cart-free WASM package
+              uses: actions/upload-artifact@v7
+              with:
+                  name: wasm-package-build
+                  path: |
+                      build/wasm-package/dithr.js
+                      build/wasm-package/dithr.wasm
                   retention-days: 1
 
             - name: Configure tests
@@ -487,10 +522,11 @@ jobs:
             - name: Install package dependencies
               run: npm install --prefix packages/sdk
 
-            - name: Download WASM build
+            - name: Download cart-free WASM package build
               uses: actions/download-artifact@v8
               with:
-                  name: wasm-build
+                  name: wasm-package-build
+                  path: build/wasm-package
 
             - name: Download Linux runtime package
               uses: actions/download-artifact@v8
@@ -500,7 +536,7 @@ jobs:
             - name: Stage runtime packages
               run: |
                   mkdir -p packages/wasm/bin packages/linux-x64/bin
-                  cp dithr.js dithr.wasm packages/wasm/bin/
+                  cp build/wasm-package/dithr.js build/wasm-package/dithr.wasm packages/wasm/bin/
                   cp bin/dithr packages/linux-x64/bin/
                   chmod 0755 packages/linux-x64/bin/dithr
 

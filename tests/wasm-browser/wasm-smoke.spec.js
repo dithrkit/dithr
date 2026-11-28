@@ -71,6 +71,15 @@ test("WASM build loads and renders a frame", async ({ page }) => {
         { timeout: 30000 },
     );
 
+    expect
+        .poll(() => consoleLogs.some((line) => line.includes("loading /cart/cart.json")), {
+            timeout: 15000,
+        })
+        .toBe(true);
+    expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
+    expect(errors).toEqual([]);
+    expect(failedRequests).toEqual([]);
+
     await expect
         .poll(
             async () => {
@@ -99,11 +108,6 @@ test("WASM build loads and renders a frame", async ({ page }) => {
             { timeout: 15000 },
         )
         .toBeGreaterThan(50);
-
-    expect(consoleLogs.some((line) => line.includes("loading /cart/cart.json"))).toBe(true);
-    expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
-    expect(errors).toEqual([]);
-    expect(failedRequests).toEqual([]);
 
     // Verify the canvas has non-zero dimensions (rendering initialised)
     const box = await canvas.boundingBox();
