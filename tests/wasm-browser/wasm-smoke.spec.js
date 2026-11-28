@@ -60,35 +60,32 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     // Wait for the canvas element to appear
     const canvas = page.locator("canvas#canvas");
     await expect(canvas).toBeVisible({ timeout: 15000 });
+    await page.evaluate(() => document.getElementById("splash")?.classList.add("hidden"));
 
     await expect
         .poll(
             async () => {
-                return canvas.evaluate((element) => {
-                    return new Promise((resolve) => {
-                        const image = new Image();
-                        image.onload = () => {
-                            const copy = document.createElement("canvas");
-                            copy.width = image.width;
-                            copy.height = image.height;
-                            const ctx = copy.getContext("2d");
-                            ctx.drawImage(image, 0, 0);
-                            const pixels = ctx.getImageData(0, 0, copy.width, copy.height).data;
-                            let visible = 0;
-                            for (let i = 0; i < pixels.length; i += 4) {
-                                if (pixels[i] || pixels[i + 1] || pixels[i + 2]) {
-                                    visible++;
-                                }
-                            }
-                            resolve(visible);
-                        };
-                        image.src = element.toDataURL("image/png");
-                    });
-                });
+                // Screenshot the compositor: WebGL may discard the readable canvas buffer.
+                const rendered = await canvas.screenshot();
+                await page.evaluate(
+                    (canvasElement) => {
+                        const bounds = canvasElement.getBoundingClientRect();
+                        const overlay = document.createElement("div");
+                        overlay.id = "dithr-blank-reference";
+                        overlay.style.cssText = `position:fixed;left:${bounds.left}px;top:${bounds.top}px;width:${bounds.width}px;height:${bounds.height}px;background:#111;z-index:2147483647`;
+                        document.body.appendChild(overlay);
+                    },
+                    await canvas.elementHandle(),
+                );
+                const blank = await canvas.screenshot();
+                await page.evaluate(() =>
+                    document.getElementById("dithr-blank-reference")?.remove(),
+                );
+                return rendered.equals(blank) ? 0 : 1;
             },
             { timeout: 15000 },
         )
-        .toBeGreaterThan(50);
+        .toBe(1);
 
     expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
     expect(errors).toEqual([]);
