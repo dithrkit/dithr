@@ -423,29 +423,30 @@ jobs:
                       build/wasm/index.html
                   retention-days: 1
 
-            - name: Configure cart-free WASM package build
+            - name: Reconfigure cart-free WASM package build
               run: >
                   cmake --preset wasm
-                  -B build/wasm-package
                   -DDTR_WASM_CART_DIR=
                   -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
-            - name: Build cart-free WASM package
-              run: cmake --build build/wasm-package
+            - name: Relink cart-free WASM package
+              run: |
+                  rm -f build/wasm/dithr.data build/wasm/dithr.data.js
+                  cmake --build build/wasm
 
             - name: Verify cart-free WASM package
               run: |
-                  strings build/wasm-package/dithr.wasm | grep -Fxq '/cart/cart.json'
-                  test ! -e build/wasm-package/dithr.data
-                  test ! -e build/wasm-package/dithr.data.js
+                  strings build/wasm/dithr.wasm | grep -Fxq '/cart/cart.json'
+                  test ! -e build/wasm/dithr.data
+                  test ! -e build/wasm/dithr.data.js
 
             - name: Upload cart-free WASM package
               uses: actions/upload-artifact@v7
               with:
                   name: wasm-package-build
                   path: |
-                      build/wasm-package/dithr.js
-                      build/wasm-package/dithr.wasm
+                      build/wasm/dithr.js
+                      build/wasm/dithr.wasm
                   retention-days: 1
 
             - name: Configure tests
@@ -534,7 +535,7 @@ jobs:
               uses: actions/download-artifact@v8
               with:
                   name: wasm-package-build
-                  path: build/wasm-package
+                  path: packages/wasm
 
             - name: Download Linux runtime package
               uses: actions/download-artifact@v8
@@ -544,7 +545,7 @@ jobs:
             - name: Stage runtime packages
               run: |
                   mkdir -p packages/wasm/bin packages/linux-x64/bin
-                  cp build/wasm-package/dithr.js build/wasm-package/dithr.wasm packages/wasm/bin/
+                  cp packages/wasm/dithr.js packages/wasm/dithr.wasm packages/wasm/bin/
                   cp bin/dithr packages/linux-x64/bin/
                   chmod 0755 packages/linux-x64/bin/dithr
 

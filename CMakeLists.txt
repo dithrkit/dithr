@@ -334,6 +334,9 @@ if (EMSCRIPTEN)
     target_link_options(dithr PRIVATE
         "--shell-file" "${CMAKE_SOURCE_DIR}/tools/templates/shell.html"
     )
+    set_property(TARGET dithr APPEND PROPERTY LINK_DEPENDS
+        "${CMAKE_SOURCE_DIR}/tools/templates/shell.html"
+    )
 endif()
 
 # Copy shared library DLLs next to the executable (Windows + shared builds only)

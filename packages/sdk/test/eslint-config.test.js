@@ -49,3 +49,18 @@ test("scaffolded JavaScript and TypeScript projects share the build command", (t
         assert.equal(typeof pkg.scripts["format:check"], "string");
     }
 });
+
+test("SDK web shell keeps the canvas within the viewport", () => {
+    const sdkShell = fs.readFileSync(
+        path.resolve(__dirname, "..", "templates", "shell.html"),
+        "utf-8",
+    );
+    const engineShell = fs.readFileSync(
+        path.resolve(__dirname, "..", "..", "..", "tools", "templates", "shell.html"),
+        "utf-8",
+    );
+
+    assert.equal(sdkShell, engineShell);
+    assert.match(sdkShell, /max-width:\s*100vw/);
+    assert.match(sdkShell, /max-height:\s*100vh/);
+});

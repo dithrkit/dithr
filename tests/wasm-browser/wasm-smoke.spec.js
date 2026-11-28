@@ -88,6 +88,12 @@ test("WASM build loads and renders a frame", async ({ page }) => {
         )
         .toBe(1);
 
+    await page.keyboard.press("Space");
+    await page.keyboard.press("ArrowRight");
+    await canvas.click();
+    await page.setViewportSize({ width: 800, height: 600 });
+    await page.waitForTimeout(500);
+
     expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
     expect(errors).toEqual([]);
     expect(failedRequests).toEqual([]);
@@ -96,4 +102,6 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     const box = await canvas.boundingBox();
     expect(box.width).toBeGreaterThan(0);
     expect(box.height).toBeGreaterThan(0);
+    expect(box.width).toBeLessThanOrEqual(800);
+    expect(box.height).toBeLessThanOrEqual(600);
 });
