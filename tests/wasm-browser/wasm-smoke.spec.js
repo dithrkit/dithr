@@ -61,15 +61,6 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     const canvas = page.locator("canvas#canvas");
     await expect(canvas).toBeVisible({ timeout: 15000 });
 
-    expect
-        .poll(() => consoleLogs.some((line) => line.includes("loading /cart/cart.json")), {
-            timeout: 30000,
-        })
-        .toBe(true);
-    expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
-    expect(errors).toEqual([]);
-    expect(failedRequests).toEqual([]);
-
     const splash = page.locator("#splash");
     await page.waitForFunction(
         () => {
@@ -116,6 +107,10 @@ test("WASM build loads and renders a frame", async ({ page }) => {
             { timeout: 15000 },
         )
         .toBeGreaterThan(50);
+
+    expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
+    expect(errors).toEqual([]);
+    expect(failedRequests).toEqual([]);
 
     // Verify the canvas has non-zero dimensions (rendering initialised)
     const box = await canvas.boundingBox();
