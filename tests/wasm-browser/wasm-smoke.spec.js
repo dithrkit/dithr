@@ -60,6 +60,7 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     // Wait for the canvas element to appear
     const canvas = page.locator("canvas#canvas");
     await expect(canvas).toBeVisible({ timeout: 15000 });
+    await page.waitForFunction(() => window.__dithrReady === true, null, { timeout: 30000 });
     await page.evaluate(() => document.getElementById("splash")?.classList.add("hidden"));
 
     await expect

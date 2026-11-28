@@ -442,3 +442,64 @@ jobs:
 
             - name: Publish create package
               run: npm publish ./packages/create --provenance --access public ${{ steps.npm-tag.outputs.tag }}
+
+    verify-published:
+        needs: publish-npm
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-22.04, macos-latest, windows-latest]
+        runs-on: ${{ matrix.os }}
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 26
+
+            - name: Test published npm consumer flows
+              env:
+                  E2E_WORK_DIR: ${{ runner.temp }}/published-npm-e2e
+              run: node tests/npm-published-e2e.js ${{ github.ref_name }}
+
+            - name: Cache Playwright browsers
+              if: runner.os == 'Linux'
+              id: published-playwright-cache
+              uses: actions/cache@v6
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tests/wasm-browser/package-lock.json') }}
+
+            - name: Install Playwright dependencies
+              if: runner.os == 'Linux'
+              working-directory: tests/wasm-browser
+              run: npm ci
+
+            - name: Install Playwright system dependencies
+              if: runner.os == 'Linux'
+              working-directory: tests/wasm-browser
+              timeout-minutes: 8
+              run: npx playwright install-deps chromium
+
+            - name: Install Playwright browser
+              if: runner.os == 'Linux' && steps.published-playwright-cache.outputs.cache-hit != 'true'
+              working-directory: tests/wasm-browser
+              timeout-minutes: 8
+              env:
+                  DEBUG: pw:install
+                  PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: 120000
+              run: npx playwright install --only-shell chromium
+
+            - name: Test published JavaScript web export
+              if: runner.os == 'Linux'
+              working-directory: tests/wasm-browser
+              env:
+                  DTR_WASM_SERVE_DIR: ${{ runner.temp }}/published-npm-e2e/consumer-javascript/build/web
+              run: npx playwright test
+
+            - name: Test published TypeScript web export
+              if: runner.os == 'Linux'
+              working-directory: tests/wasm-browser
+              env:
+                  DTR_WASM_SERVE_DIR: ${{ runner.temp }}/published-npm-e2e/consumer-typescript/build/web
+              run: npx playwright test

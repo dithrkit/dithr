@@ -235,12 +235,23 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
      * so the virtual FS is populated before persist_load runs. */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wvariadic-macro-arguments-omitted"
-    EM_ASM(FS.mkdir('/libsdl'); FS.mount(IDBFS, {}, '/libsdl'); FS.syncfs(
-        true, function(err) {
-            if (err)
-                console.warn('IDBFS initial sync failed:', err);
-            Module._dtr_idbfs_ready();
-        }););
+    EM_ASM(FS.mkdir('/libsdl'); FS.mount(IDBFS, {}, '/libsdl'); var complete = false;
+           function                                                 finish(err) {
+               if (complete)
+                   return;
+               complete = true;
+               if (err)
+                   console.warn('IDBFS initial sync failed:', err);
+               Module._dtr_idbfs_ready();
+           } FS.syncfs(true, finish);
+           setTimeout(
+               function() {
+                   if (!complete) {
+                       console.error('IDBFS initial sync timed out');
+                       finish(new Error('IDBFS initial sync timed out'));
+                   }
+               },
+               15000););
 #pragma clang diagnostic pop
 
     app->idbfs_ready = false;
@@ -322,6 +333,10 @@ SDL_AppResult SDL_AppIterate(void *appstate)
             SDL_Log("Failed to create console");
             return SDL_APP_FAILURE;
         }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvariadic-macro-arguments-omitted"
+        EM_ASM(window.__dithrReady = true;);
+#pragma clang diagnostic pop
     }
 #endif
 
