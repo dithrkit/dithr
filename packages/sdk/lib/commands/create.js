@@ -140,7 +140,7 @@ const pkg = {
     description: `${name} — dithr cart`,
     scripts: {
         start: useTypescript ? "dithrkit dev" : "dithrkit run",
-        build: useTypescript ? "dithrkit build" : undefined,
+        build: "dithrkit build",
         serve: "dithrkit serve",
         watch: "dithrkit watch",
         lint: "eslint src/",

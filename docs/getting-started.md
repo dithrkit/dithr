@@ -262,7 +262,7 @@ npx dithrkit export --desktop
 | Script              | Description                              |
 | ------------------- | ---------------------------------------- |
 | `npm start`         | Run the game (JS: `run`, TS: `dev`)      |
-| `npm run build`     | Bundle TypeScript (TS projects only)     |
+| `npm run build`     | Build if required (no-op for plain JS)   |
 | `npm run lint`      | ESLint check                             |
 | `npm run lint:fix`  | ESLint auto-fix                          |
 | `npm run format`    | Prettier auto-format                     |

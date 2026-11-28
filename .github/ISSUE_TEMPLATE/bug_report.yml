@@ -47,4 +47,4 @@ body:
       id: version
       attributes:
           label: dithr version or commit
-          placeholder: e.g. v0.5.1 or abc1234
+          placeholder: e.g. v0.5.2 or abc1234

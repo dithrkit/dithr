@@ -10,5 +10,5 @@ export function _update(_dt: number): void {
 
 export function _draw(): void {
     gfx.cls(0);
-    gfx.print("hello, dithr!", 4, 4, 7);
+    gfx.print('hello, dithr!', 4, 4, 7);
 }

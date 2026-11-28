@@ -1,6 +1,6 @@
 {
   "name": "@dithrkit/sdk",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "SDK and CLI for the dithr fantasy console",
   "license": "MIT",
   "author": "dithrkit",
@@ -48,10 +48,15 @@
     "esbuild": "^0.28.2"
   },
   "optionalDependencies": {
-    "@dithrkit/darwin-arm64": "0.5.1",
-    "@dithrkit/linux-arm64": "0.5.1",
-    "@dithrkit/linux-x64": "0.5.1",
-    "@dithrkit/wasm": "0.5.1",
-    "@dithrkit/win32-x64": "0.5.1"
+    "@dithrkit/darwin-arm64": "0.5.2",
+    "@dithrkit/linux-arm64": "0.5.2",
+    "@dithrkit/linux-x64": "0.5.2",
+    "@dithrkit/wasm": "0.5.2",
+    "@dithrkit/win32-x64": "0.5.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0"
   }
 }

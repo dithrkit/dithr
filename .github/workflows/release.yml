@@ -294,6 +294,9 @@ jobs:
             - name: Build
               run: cmake --build build/wasm
 
+            - name: Verify default WASM cart path
+              run: strings build/wasm/dithr.wasm | grep -Fxq '/cart/cart.json'
+
             - name: Stage npm package
               run: |
                   mkdir -p packages/wasm/bin

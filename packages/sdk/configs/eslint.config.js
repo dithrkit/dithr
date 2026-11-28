@@ -50,6 +50,7 @@ const jsConfig = [
         rules: {
             ...BASE_RULES,
             "no-plusplus": ["error", { allowForLoopAfterthoughts: true }],
+            "no-unused-vars": ["error", { varsIgnorePattern: "^_", argsIgnorePattern: "^_" }],
         },
     },
 ];

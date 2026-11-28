@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 
 project(dithr
-    VERSION 0.5.1
+    VERSION 0.5.2
     DESCRIPTION "Fantasy console engine for building retro games"
     LANGUAGES C
 )
@@ -130,7 +130,7 @@ set(DTR_AUDIO_BUFFER      2048  CACHE STRING "Audio buffer size")
 set(DTR_TARGET_FPS        60    CACHE STRING "Target framerate")
 set(DTR_JS_HEAP_MB        64    CACHE STRING "JS heap size in MB")
 set(DTR_JS_STACK_KB       512   CACHE STRING "JS stack size in KB")
-set(DTR_VERSION_STR       "0.5.1" CACHE STRING "Engine version string")
+set(DTR_VERSION_STR       "0.5.2" CACHE STRING "Engine version string")
 
 # --- Dependencies ---
 include(FetchContent)
@@ -292,6 +292,8 @@ target_link_libraries(dithr PRIVATE dithr_core)
 
 # --- Emscripten / WASM ---
 if (EMSCRIPTEN)
+    target_compile_definitions(dithr PRIVATE DTR_WASM_CART_PATH="/cart/cart.json")
+
     # Cart directory to embed in the virtual filesystem
     set(DTR_WASM_CART_DIR "" CACHE PATH "Cart directory to preload for WASM builds")
 
@@ -322,8 +324,6 @@ if (EMSCRIPTEN)
         target_link_options(dithr PRIVATE
             "SHELL:--preload-file ${DTR_WASM_CART_DIR}@/cart"
         )
-        target_compile_definitions(dithr PRIVATE DTR_WASM_CART_PATH="/cart/cart.json")
-
         # Track cart directory contents so Ninja relinks when assets change
         file(GLOB_RECURSE DTR_CART_FILES "${DTR_WASM_CART_DIR}/*")
         set_property(TARGET dithr PROPERTY LINK_DEPENDS ${DTR_CART_FILES})
