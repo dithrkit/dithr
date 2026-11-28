@@ -15,7 +15,12 @@ const zlib = require("node:zlib");
 const { execSync } = require("node:child_process");
 
 const PORT = parseInt(process.argv[2], 10) || 8080;
-const SERVE_DIR = path.resolve(__dirname, "..", "build", "wasm");
+const SERVE_DIR = process.env.DTR_WASM_SERVE_DIR
+    ? path.resolve(process.env.DTR_WASM_SERVE_DIR)
+    : path.resolve(__dirname, "..", "build", "wasm");
+const DEFAULT_FILE = fs.existsSync(path.join(SERVE_DIR, "index.html"))
+    ? "/index.html"
+    : "/dithr.html";
 
 const MIME_TYPES = {
     ".html": "text/html; charset=utf-8",
@@ -50,8 +55,7 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, `http://localhost:${PORT}`);
     let relPath = decodeURIComponent(url.pathname);
 
-    // Default to index → dithr.html
-    if (relPath === "/") relPath = "/dithr.html";
+    if (relPath === "/") relPath = DEFAULT_FILE;
 
     // Prevent path traversal
     const filePath = path.resolve(SERVE_DIR, relPath.slice(1));

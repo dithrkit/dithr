@@ -62,7 +62,7 @@ if (!esbuildBin) {
 }
 
 try {
-    const result = spawnSync(process.execPath, [esbuildBin, ...esbuildArgs], {
+    const result = spawnSync(esbuildBin, esbuildArgs, {
         stdio: "inherit",
         cwd: process.cwd(),
     });

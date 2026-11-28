@@ -3,7 +3,7 @@
  * @brief Playwright smoke test — loads the WASM build in a headless browser
  *        and verifies the canvas renders at least one frame.
  *
- * Expects the WASM build output in build/wasm/ (served by tools/serve-wasm.js).
+ * Expects the WASM build output in build/wasm/, unless DTR_WASM_SERVE_DIR is set.
  */
 
 const { test, expect } = require("@playwright/test");
@@ -17,9 +17,11 @@ test.beforeAll(async () => {
     const { spawn } = require("node:child_process");
     const path = require("node:path");
 
+    const serveDir = process.env.DTR_WASM_SERVE_DIR;
     server = spawn("node", [path.resolve(__dirname, "../../tools/serve-wasm.js"), String(PORT)], {
         stdio: "pipe",
         cwd: path.resolve(__dirname, "../.."),
+        env: { ...process.env, ...(serveDir ? { DTR_WASM_SERVE_DIR: serveDir } : {}) },
     });
 
     // Wait for the server to start listening
@@ -46,9 +48,12 @@ test.afterAll(async () => {
 });
 
 test("WASM build loads and renders a frame", async ({ page }) => {
-    // Collect console errors
     const errors = [];
+    const consoleLogs = [];
+    const failedRequests = [];
     page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (message) => consoleLogs.push(message.text()));
+    page.on("requestfailed", (request) => failedRequests.push(request.url()));
 
     await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
 
@@ -66,8 +71,39 @@ test("WASM build loads and renders a frame", async ({ page }) => {
         { timeout: 30000 },
     );
 
-    // Verify no JS errors occurred during load
+    await expect
+        .poll(
+            async () => {
+                return canvas.evaluate((element) => {
+                    return new Promise((resolve) => {
+                        const image = new Image();
+                        image.onload = () => {
+                            const copy = document.createElement("canvas");
+                            copy.width = image.width;
+                            copy.height = image.height;
+                            const ctx = copy.getContext("2d");
+                            ctx.drawImage(image, 0, 0);
+                            const pixels = ctx.getImageData(0, 0, copy.width, copy.height).data;
+                            let visible = 0;
+                            for (let i = 0; i < pixels.length; i += 4) {
+                                if (pixels[i] || pixels[i + 1] || pixels[i + 2]) {
+                                    visible++;
+                                }
+                            }
+                            resolve(visible);
+                        };
+                        image.src = element.toDataURL("image/png");
+                    });
+                });
+            },
+            { timeout: 15000 },
+        )
+        .toBeGreaterThan(50);
+
+    expect(consoleLogs.some((line) => line.includes("loading /cart/cart.json"))).toBe(true);
+    expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
     expect(errors).toEqual([]);
+    expect(failedRequests).toEqual([]);
 
     // Verify the canvas has non-zero dimensions (rendering initialised)
     const box = await canvas.boundingBox();

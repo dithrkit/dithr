@@ -71,7 +71,7 @@ function buildSync(cartDir) {
         `--outfile=${info.outFile}`,
     ];
 
-    const result = spawnSync(process.execPath, [esbuildBin, ...esbuildArgs], {
+    const result = spawnSync(esbuildBin, esbuildArgs, {
         stdio: "inherit",
         cwd: cartDir,
     });

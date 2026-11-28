@@ -147,11 +147,18 @@ WASM) and available CMake cache variables.
 
 These flags are accepted by the native `dithr` binary directly:
 
-| Flag           | Short | Description                |
-| -------------- | ----- | -------------------------- |
-| `--fullscreen` | `-f`  | Start in fullscreen mode   |
-| `--scale N`    | `-s`  | Window scale factor (1–10) |
-| `--mute`       | `-m`  | Start with audio muted     |
+| Flag           | Short | Description                                |
+| -------------- | ----- | ------------------------------------------ |
+| `--help`       | `-h`  | Show command-line help                     |
+| `--version`    | `-v`  | Print engine version                       |
+| `--fullscreen` | `-f`  | Start in fullscreen mode                   |
+| `--scale N`    | `-s`  | Window scale factor (1–10)                 |
+| `--mute`       | `-m`  | Start with audio muted                     |
+| `--headless`   | —     | Run without a display                      |
+| `--frames N`   | —     | Exit after N frames; requires `--headless` |
+
+Any final positional argument is the path to a `cart.json` file. The default is
+`cart.json` in the current directory.
 
 ## Documentation
 
