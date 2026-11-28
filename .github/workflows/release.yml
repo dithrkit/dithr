@@ -338,6 +338,39 @@ jobs:
                       dithr-macos-arm64.tar.gz
                       SHA256SUMS
 
+    verify-release-assets:
+        needs: release
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Download published release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  gh release download "${GITHUB_REF_NAME}" \
+                    --repo "${GITHUB_REPOSITORY}" \
+                    --pattern 'SHA256SUMS' \
+                    --pattern 'dithr-*.tar.gz' \
+                    --pattern 'dithr-windows-x64.zip' \
+                    --dir dist
+
+            - name: Verify published checksums
+              working-directory: dist
+              run: sha256sum --check SHA256SUMS
+
+            - name: Inspect release archives
+              run: |
+                  unzip -t dist/dithr-windows-x64.zip
+                  for archive in dist/dithr-*-*.tar.gz; do
+                    tar tzf "$archive" >/dev/null
+                  done
+
+            - name: Verify published Linux executable
+              run: |
+                  mkdir -p dist/linux
+                  tar xzf dist/dithr-linux-x64.tar.gz -C dist/linux
+                  test -x dist/linux/dithr
+                  dist/linux/dithr --version 2>&1 | grep -F "${GITHUB_REF_NAME#v}"
+
     publish-npm:
         needs: [build-windows, build-linux, build-linux-arm64, build-macos, build-wasm]
         runs-on: ubuntu-latest

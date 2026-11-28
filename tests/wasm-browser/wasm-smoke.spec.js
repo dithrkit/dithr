@@ -51,6 +51,17 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     const errors = [];
     const consoleLogs = [];
     const failedRequests = [];
+    await page.addInitScript(() => {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        window.__dithrAudioContexts = [];
+        window.AudioContext = class extends AudioContextClass {
+            constructor(...args) {
+                super(...args);
+                window.__dithrAudioContexts.push(this);
+            }
+        };
+    });
     page.on("pageerror", (err) => errors.push(err.message));
     page.on("console", (message) => consoleLogs.push(message.text()));
     page.on("requestfailed", (request) => failedRequests.push(request.url()));
@@ -61,6 +72,7 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     const canvas = page.locator("canvas#canvas");
     await expect(canvas).toBeVisible({ timeout: 15000 });
     await page.waitForFunction(() => window.__dithrReady === true, null, { timeout: 30000 });
+    expect(await page.evaluate(() => window.__dithrAudioReady)).toBe(true);
     await page.evaluate(() => document.getElementById("splash")?.classList.add("hidden"));
 
     await expect
@@ -93,13 +105,39 @@ test("WASM build loads and renders a frame", async ({ page }) => {
     await canvas.click();
     await page.setViewportSize({ width: 800, height: 600 });
     await page.waitForTimeout(500);
+    await expect
+        .poll(
+            () =>
+                page.evaluate(() =>
+                    window.__dithrAudioContexts?.some((context) => context.state === "running"),
+                ),
+            { timeout: 10000 },
+        )
+        .toBe(true);
+
+    const persistenceToken = `dithr-e2e-${Date.now()}`;
+    await page.evaluate((token) => {
+        Module.FS.writeFile("/libsdl/browser-smoke.txt", token);
+        return new Promise((resolve, reject) => {
+            Module.FS.syncfs(false, (error) => (error ? reject(error) : resolve()));
+        });
+    }, persistenceToken);
+
+    await page.reload({ waitUntil: "domcontentloaded", timeout: 30000 });
+    await page.waitForFunction(() => window.__dithrReady === true, null, { timeout: 30000 });
+    expect(
+        await page.evaluate(() => {
+            return new TextDecoder().decode(Module.FS.readFile("/libsdl/browser-smoke.txt"));
+        }),
+    ).toBe(persistenceToken);
+    await page.evaluate(() => document.getElementById("splash")?.classList.add("hidden"));
 
     expect(consoleLogs.some((line) => line.includes("No cart file"))).toBe(false);
     expect(errors).toEqual([]);
     expect(failedRequests).toEqual([]);
 
     // Verify the canvas has non-zero dimensions (rendering initialised)
-    const box = await canvas.boundingBox();
+    const box = await page.locator("canvas#canvas").boundingBox();
     expect(box.width).toBeGreaterThan(0);
     expect(box.height).toBeGreaterThan(0);
     expect(box.width).toBeLessThanOrEqual(800);

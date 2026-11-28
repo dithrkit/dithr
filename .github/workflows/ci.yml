@@ -437,6 +437,8 @@ jobs:
             - name: Verify cart-free WASM package
               run: |
                   strings build/wasm/dithr.wasm | grep -Fxq '/cart/cart.json'
+                  test "$(stat -c%s build/wasm/dithr.wasm)" -lt 4194304
+                  test "$(stat -c%s build/wasm/dithr.js)" -lt 524288
                   test ! -e build/wasm/dithr.data
                   test ! -e build/wasm/dithr.data.js
 

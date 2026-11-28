@@ -335,7 +335,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wvariadic-macro-arguments-omitted"
-        EM_ASM(window.__dithrReady = true;);
+#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
+        EM_ASM(
+            {
+                window.__dithrReady      = true;
+                window.__dithrAudioReady = $0 == 1;
+            },
+            app->con->audio != NULL);
 #pragma clang diagnostic pop
     }
 #endif
