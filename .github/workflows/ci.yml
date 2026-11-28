@@ -356,6 +356,9 @@ jobs:
                   npm ci --ignore-scripts
                   npm run build
 
+            - name: Stage smoke-test cart
+              run: node tools/stage-cart.js examples/hello_world "$RUNNER_TEMP/dithr-cart"
+
             - name: Install Ninja
               run: sudo apt-get update && sudo apt-get install -y ninja-build
 
@@ -400,11 +403,16 @@ jobs:
             - name: Configure
               run: >
                   cmake --preset wasm
-                  -DDTR_WASM_CART_DIR=${{ github.workspace }}/examples/hello_world
+                  -DDTR_WASM_CART_DIR=$RUNNER_TEMP/dithr-cart
                   -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
             - name: Build
               run: cmake --build build/wasm
+
+            - name: Check smoke-test cart payload size
+              run: |
+                  test -s build/wasm/dithr.data
+                  test "$(stat -c%s build/wasm/dithr.data)" -lt 10485760
 
             - name: Upload WASM build
               uses: actions/upload-artifact@v7
